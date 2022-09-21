@@ -22,7 +22,10 @@ Database Owner -
 `git add .`
 `git commit -m "<describe commit here>"`
 
-5. Once you have completed development on the ticket, you will need to pull changes that have been made to the main branch
+5. Once you have completed development on the ticket, you will need to pull changes that have been made to the main branch into your local main branch and then rebase your branch into main
+`git checkout main`
+`git pull`
+`git checkout <your branch here>`
 `git rebase main`
 
 6. Push your changes to your branch
