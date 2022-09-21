@@ -1,5 +1,14 @@
 # chess-swe-group-project
 
+## Team Roles
+Team Leader - Zachary Humphrey
+
+Backend Owner - 
+
+Frontend Owner - 
+
+Database Owner - 
+
 ## Contribution Process
 1. Pull the code down to your machine
 `git clone https://github.com/zacharyjhumphrey/chess-swe-group-project.git`
