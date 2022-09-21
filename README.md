@@ -3,7 +3,7 @@
 ## Team Roles
 Team Leader - Zachary Humphrey
 
-Backend Owner - 
+Backend Owner - Cole McCauley
 
 Frontend Owner - 
 
