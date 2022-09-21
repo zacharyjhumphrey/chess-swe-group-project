@@ -5,7 +5,7 @@ Team Leader - Zachary Humphrey
 
 Backend Owner - 
 
-Frontend Owner - 
+Frontend Owner - Seth DeWalt
 
 Database Owner - Miguel
 
