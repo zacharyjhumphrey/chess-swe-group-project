@@ -7,7 +7,7 @@ Backend Owner -
 
 Frontend Owner - 
 
-Database Owner - 
+Database Owner - Miguel
 
 ## Contribution Process
 1. Pull the code down to your machine
