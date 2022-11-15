@@ -5,9 +5,9 @@ Team Leader - Zachary Humphrey
 
 Backend Owner - Cole McCauley
 
-Frontend Owner - 
+Frontend Owner - Seth DeWalt
 
-Database Owner - 
+Database Owner - Miguel
 
 ## Contribution Process
 1. Pull the code down to your machine
