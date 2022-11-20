@@ -14,11 +14,6 @@ public class MoveData implements Serializable{
 	 return y;
  }
  
- public int[] getLocation() {
-	 int[] location = {x, y};
-	 return location;
- }
- 
  public void setX(int xcord) {
 	 x = xcord;
  }
@@ -27,7 +22,7 @@ public class MoveData implements Serializable{
 	 y = ycord;
  }
  
- public void MoveData(int xcord, int ycord) {
+ public MoveData(int xcord, int ycord) {
 	 x = xcord;
 	 y = ycord;
  }
