@@ -1,42 +1,67 @@
 package backend;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PieceData implements Serializable{
-	private int[][] possiblemoves;
-	private String pieceType;
-	private int x;
-	private int y;
+	private String color;
+	private String type;
+	private Position position;
+	private int value;
+	public boolean moved = false;
 	
-	public int[][] getMoves() {
-		return possiblemoves;
+	
+	public PieceData(String c,String t, int x, int y) {
+		this.color = c.toLowerCase();
+		this.type = t.toLowerCase();
+		this.position = new Position(x,y);
+		switch(type) {
+			case "pawn":
+				value = 1;
+				break;
+			case "rook":
+				value = 5;
+				break;
+			case "knight":
+				value = 3;
+				break;
+			case "bishop":
+				value = 3;
+				break;
+			case "queen":
+				value = 9;
+				break;
+			case "king":
+				value = 0;
+				break;
+		}
 	}
-
+	public void setPosition(int x, int y) {
+		this.position = new Position(x, y);
+		moved = true;
+	}
+	
+	public Position getPosition(){
+		return position;
+	}
+	
+	public int getValue() {
+		return value;
+	}
+	
 	public String getType() {
-		return pieceType;
+		return type;
 	}
 	
-	public int[] getLocation() {
-		int[] currentlocation = {x, y};
-		return currentlocation;
+	public String getColor() {
+		return color;
 	}
 	
-	public void setMoves(int[][] locations) {
-		possiblemoves = locations;
+	public String toString() {
+		return color +","+ type +" | position ("+position.toString()+")";
 	}
 	
-	public void setType(String type) {
-		pieceType = type;
-	}
 	
-	public void setlocation(int xcord, int ycord) {
-		x = xcord;
-		y = ycord;
-	}
-	
-	public PieceData(String type, int[][] locations, int x, int y) {
-		setMoves(locations);
-		setType(type);
-		setlocation(x,y);
-	}
+
 }

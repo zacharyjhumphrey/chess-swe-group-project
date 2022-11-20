@@ -11,17 +11,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.List;
 
 public class Server extends AbstractServer
 {
-  private JTextArea log;
-  private JLabel status;
   private Queue<Object> userswaitingforgame = new LinkedList<>();
   private PieceData pieceData;
+  private Game gameBoard = new Game();
   
   public Server()
   {
-    super(12345);
+    super(8300);
   }
   
   public Server(int port)
@@ -29,25 +29,10 @@ public class Server extends AbstractServer
     super(port);
   }
   
-  public void setLog(JTextArea log)
-  {
-    this.log = log;
+  public Game getGame() {
+	  return gameBoard;
   }
   
-  public JTextArea getLog()
-  {
-    return log;
-  }
-  
-  public void setStatus(JLabel status)
-  {
-    this.status = status;
-  }
-  
-  public JLabel getStatus()
-  {
-    return status;
-  }
   
   
   
@@ -97,23 +82,71 @@ public class Server extends AbstractServer
 	    {
 		  
 		  pieceData = (PieceData)arg0;
-		  //when peice is selected by user
-		  //takes in peiceData location and moves list
-		  //adds each move from list to current location resulting in possible location
-		  //pushes possible location to list
-		  //sends list of all possible move locations
-		  //updates game to show possible moves highlighted.
-	       
+		  List<Position> moves = new ArrayList<Position>();
+		  int x = pieceData.getPosition().x;
+		  int y = pieceData.getPosition().y;
+		  System.out.println("x: "+x+", y: "+y);
+		  switch(pieceData.getColor()) {
+		  case("w"):
+			  switch(pieceData.getType()) {
+			  case "pawn":
+				  Position p = new Position(x,y-1);
+				  moves.add(p);
+				  if(!pieceData.moved) {
+					  p = new Position(x,y-2);
+					  moves.add(p);
+				  }
+				break;
+			  case "rook":
+				  
+				break;
+			  case "knight":
+				break;
+			  case "bishop":
+				break;
+			  case "queen":
+				break;
+			  case "king":
+				break;
+			  } 
+		  	break;
+		  case("b"):
+			  switch(pieceData.getType()) {
+			  case "pawn":
+				  Position p = new Position(x,y+1);
+				  moves.add(p);
+				  if(!pieceData.moved) {
+					  p = new Position(x,y+2);
+					  moves.add(p);
+				  }
+				break;
+			  case "rook":
+				
+				break;
+			  case "knight":
+				break;
+			  case "bishop":
+				break;
+			  case "queen":
+				break;
+			  case "king":
+				break;
+			  } 
+		  	break;
+		  }
+	      	//send array list to user
+		  System.out.println(moves.toString());
 	    }
 	  
 	  if (arg0 instanceof MoveData)
 	    {
-		  
+		  System.out.println("recieved move data");
 		  MoveData moveData = (MoveData)arg0;
 		  //when user selects move to make
 		//verifies location is valid
-		  pieceData.setlocation(moveData.getX(), moveData.getY());
+		  pieceData.setPosition(moveData.getX(), moveData.getY());
 		  //updates game to show piece has been moved
+		  gameBoard.updateBoard();
 	       
 	    }
 	  
