@@ -3,6 +3,9 @@ package backend;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 import javax.swing.*;
+
+import database.Database;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,18 +18,22 @@ import java.util.List;
 
 public class Server extends AbstractServer
 {
+  private Database database;
   private Queue<Object> userswaitingforgame = new LinkedList<>();
+  private PieceData pieceData;
   private PieceData currentPiece;
   private Game gameBoard = new Game();
   
   public Server()
   {
     super(8300);
+    database = new Database();
   }
   
   public Server(int port)
   {
     super(port);
+    database = new Database();
   }
   
   public Game getGame() {
@@ -48,24 +55,60 @@ public class Server extends AbstractServer
 	    {
 		  
 		  CreateAccountData createAccountData = (CreateAccountData)arg0;
-		  User newUser = new User(createAccountData.getUsername(),createAccountData.getPassword());
-	      DatabaseFile.add(newUser);
-	    		   
+		  
+		  //checks if username dose not exist
+		  if(!database.usernameExists(createAccountData))
+		  {
+			  try 
+			  {
+				  database.CreateAccount(createAccountData);;
+				  User newUser = new User(createAccountData.getUsername(),createAccountData.getPassword());
+				  arg1.sendToClient("Account Created");
+			  } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			  }
+		  }
+		  else
+		  {
+			  try 
+			  {
+				  arg1.sendToClient("Username already exists.");
+			  } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		  }
+	      
 	       
 	    }
 	  
 	  if (arg0 instanceof LoginData)
-	    {
-	       LoginData loginData = (LoginData)arg0;
-	       try {
-			if(DatabaseFile.verify(loginData.getUsername(), loginData.getPassword())) {
-			   User currentUser = new User(loginData.getUsername(),loginData.getPassword());
-				currentUser.setId(Integer.valueOf(DatabaseFile.getid(currentUser.getUsername())));
-			   }
-		}catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-	    } 
+	  {
+		  LoginData loginData = (LoginData)arg0;
+		  
+		  //Checks if username and password exist in database;
+		  if(database.credentialsValid(loginData))
+		  {
+			  try {
+					User user = new User(loginData.getUsername(), loginData.getPassword());
+					arg1.sendToClient("Login Authenticated");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		  }
+		  else 
+		  {
+			  try {
+					arg1.sendToClient("Username/Pasword not found");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		  }
+	       
+	  } 
 	  
 	  if (arg0 instanceof StartData)
 	    {
