@@ -18,22 +18,16 @@ import java.util.List;
 
 public class Server extends AbstractServer
 {
+  private Database database;
   private Queue<Object> userswaitingforgame = new LinkedList<>();
   private PieceData pieceData;
-<<<<<<< HEAD
+  private PieceData currentPiece;
   private Game gameBoard = new Game();
   
   public Server()
   {
     super(8300);
-=======
-  private Database database;
-  
-  public Server()
-  {
-    super(12345);
     database = new Database();
->>>>>>> 716601b (implemnted databse connectivity + panels/controllers)
   }
   
   public Server(int port)
@@ -44,6 +38,10 @@ public class Server extends AbstractServer
   
   public Game getGame() {
 	  return gameBoard;
+  }
+  
+  public PieceData getCurrentPiece() {
+	  return currentPiece;
   }
   
   
@@ -130,24 +128,40 @@ public class Server extends AbstractServer
 	  if (arg0 instanceof PieceData)
 	    {
 		  
-		  pieceData = (PieceData)arg0;
-		  List<Position> moves = new ArrayList<Position>();
+		  PieceData pieceData = (PieceData)arg0;
+		  currentPiece = pieceData;
+		  List<PositionData> moves = new ArrayList<PositionData>();
 		  int x = pieceData.getPosition().x;
 		  int y = pieceData.getPosition().y;
+		  int offset = 0;
+		  PositionData p;
 		  System.out.println("x: "+x+", y: "+y);
 		  switch(pieceData.getColor()) {
 		  case("w"):
 			  switch(pieceData.getType()) {
 			  case "pawn":
-				  Position p = new Position(x,y-1);
-				  moves.add(p);
-				  if(!pieceData.moved) {
-					  p = new Position(x,y-2);
+				  p = new PositionData(x,y-1);
+				  if(!gameBoard.checkCollision(p)) {
 					  moves.add(p);
+				  }
+				  if(!pieceData.moved) {
+					  p = new PositionData(x,y-2);
+					  if(!gameBoard.checkCollision(p)) {
+					  moves.add(p);
+					  }
 				  }
 				break;
 			  case "rook":
-				  
+				  offset = 1;
+				  p = new PositionData(x,y-offset);
+				  while(!gameBoard.checkCollision(p)) {
+					  moves.add(p);
+					  offset++;
+					  p = new PositionData(x,y-offset);
+				  }
+				  if(gameBoard.getPieces().get(Arrays.asList(p.x,p.y)).getColor() !="w") {
+					  moves.add(p);
+				  }
 				break;
 			  case "knight":
 				break;
@@ -162,15 +176,25 @@ public class Server extends AbstractServer
 		  case("b"):
 			  switch(pieceData.getType()) {
 			  case "pawn":
-				  Position p = new Position(x,y+1);
+				  p = new PositionData(x,y+1);
 				  moves.add(p);
 				  if(!pieceData.moved) {
-					  p = new Position(x,y+2);
+					  p = new PositionData(x,y+2);
 					  moves.add(p);
 				  }
 				break;
 			  case "rook":
-				
+				  offset = 1;
+				  p = new PositionData(x,y+offset);
+				  while(!gameBoard.checkCollision(p)) {
+					  moves.add(p);
+					  offset++;
+					  p = new PositionData(x,y+offset);
+				  }
+				  if(gameBoard.getPieces().get(Arrays.asList(p.x,p.y)).getColor() !="b") {
+					  moves.add(p);
+				  }
+				  
 				break;
 			  case "knight":
 				break;
@@ -187,13 +211,16 @@ public class Server extends AbstractServer
 		  System.out.println(moves.toString());
 	    }
 	  
-	  if (arg0 instanceof MoveData)
+	  if (arg0 instanceof PositionData)
 	    {
-		  System.out.println("recieved move data");
-		  MoveData moveData = (MoveData)arg0;
 		  //when user selects move to make
+		  PositionData position = (PositionData)arg0;
 		//verifies location is valid
-		  pieceData.setPosition(moveData.getX(), moveData.getY());
+		  List<Integer> oldp = Arrays.asList(currentPiece.getPosition().x,currentPiece.getPosition().y);
+		  List<Integer> newp = Arrays.asList(position.x,position.y);
+		  currentPiece.setPosition(position.x, position.y);
+		  gameBoard.getPieces().remove(oldp);
+		  gameBoard.getPieces().put(newp, currentPiece);
 		  //updates game to show piece has been moved
 		  gameBoard.updateBoard();
 	       

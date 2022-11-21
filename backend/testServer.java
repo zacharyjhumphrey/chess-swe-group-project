@@ -1,10 +1,12 @@
 package backend;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class testServer {
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		
 		//create server
 		Server server = new Server(8300);
@@ -33,29 +35,41 @@ public class testServer {
 		
 		//send piecedata to server
 		try {
-			
-			client.sendToServer(server.getGame().getPieces()[8]);
+			client.sendToServer(server.getGame().getPieces().get(Arrays.asList(0,1)));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//send movedata to client  //currently not working
-		MoveData m = new MoveData(0,2);
-//		
-//		try {
-//			client.sendToServer(m);
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		//have to add rest here for moveData to register in server
+		//should be fine in final implementation.
+		 Thread ct = new Thread() {
+			 public void run()
+			 {
+				 int t = 0;
+				 t++;
+			 }
+		 };
+		 
+		 ct.start();
+		 try {
+			ct.sleep(500);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		ct.stop();
 		
-		server.getGame().getPieces()[8].setPosition(m.getX(), m.getY());
-		server.getGame().updateBoard();
+		//send PositionData to client  //currently not working
+		PositionData p = new PositionData(0,3);
+		try {
+			client.sendToServer(p);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
-		
-		
-		
+		// close client and server
 		try {
 			client.closeConnection();
 			server.close();
