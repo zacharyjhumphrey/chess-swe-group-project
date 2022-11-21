@@ -7,7 +7,7 @@ import java.util.List;
 public class PieceData implements Serializable{
 	private String color;
 	private String type;
-	private Position position;
+	private PositionData position;
 	private int value;
 	public boolean moved = false;
 	
@@ -15,7 +15,7 @@ public class PieceData implements Serializable{
 	public PieceData(String c,String t, int x, int y) {
 		this.color = c.toLowerCase();
 		this.type = t.toLowerCase();
-		this.position = new Position(x,y);
+		this.position = new PositionData(x,y);
 		switch(type) {
 			case "pawn":
 				value = 1;
@@ -38,11 +38,11 @@ public class PieceData implements Serializable{
 		}
 	}
 	public void setPosition(int x, int y) {
-		this.position = new Position(x, y);
+		this.position = new PositionData(x, y);
 		moved = true;
 	}
 	
-	public Position getPosition(){
+	public PositionData getPosition(){
 		return position;
 	}
 	
