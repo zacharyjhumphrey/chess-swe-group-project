@@ -25,7 +25,8 @@ public class MenuControl implements ActionListener
     // The Login button takes the user to the login panel.
     if (command.equals("Start Game"))
     {
-     
+    	CardLayout cardLayout = (CardLayout)container.getLayout();
+        cardLayout.show(container, "6");
     }
     
     // The Create button takes the user to the create account panel.

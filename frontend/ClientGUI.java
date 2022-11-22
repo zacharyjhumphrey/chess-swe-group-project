@@ -24,6 +24,7 @@ public class ClientGUI extends JFrame
 		FriendsListControl fl = new FriendsListControl(container);
 		CreateAccountControl ca = new CreateAccountControl(container);
 		MenuControl	mc = new MenuControl(container);
+		GameControl	gc = new GameControl(container);
 
 		//Probably will want to pass in Client here
 
@@ -35,6 +36,7 @@ public class ClientGUI extends JFrame
 		JPanel view3 = new FriendsListPanel(fl);
 		JPanel view4 = new CreateAccountPanel(ca);
 		JPanel view5 = new MenuPanel(mc);
+		JPanel view6 = new GamePanel(gc);
 
 		// Add the views to the card layout container.
 		container.add(view1, "1");
@@ -42,6 +44,7 @@ public class ClientGUI extends JFrame
 		container.add(view3, "3");
 		container.add(view4, "4");
 		container.add(view5, "5");
+		container.add(view6, "6");
 
 
 		// Show the initial view in the card layout.
@@ -51,8 +54,9 @@ public class ClientGUI extends JFrame
 		this.add(container, BorderLayout.CENTER);
 
 		// Show the JFrame.
-		this.setSize(550, 350);
+		this.setSize(1000, 900);
 		this.setVisible(true);
+		this.setResizable(false);
 	}
 
 	// Main function that creates the client GUI when the program is started.
