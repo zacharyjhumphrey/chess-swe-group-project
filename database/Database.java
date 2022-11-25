@@ -2,8 +2,8 @@ package database;
 
 import java.util.*;
 
-import backend.CreateAccountData;
-import backend.LoginData;
+import common.CreateAccountData;
+import common.LoginData;
 
 import java.io.*;
 import java.sql.*;

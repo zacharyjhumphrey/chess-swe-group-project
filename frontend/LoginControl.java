@@ -3,7 +3,7 @@ package frontend;
 import java.awt.*;
 import javax.swing.*;
 
-import backend.LoginData;
+import common.LoginData;
 
 import java.awt.event.*;
 import java.io.IOException;
