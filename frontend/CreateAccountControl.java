@@ -6,7 +6,8 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
-import backend.CreateAccountData;
+
+import common.CreateAccountData;
 
 //TODO Ensure I removed the right thing
 public class CreateAccountControl implements ActionListener {

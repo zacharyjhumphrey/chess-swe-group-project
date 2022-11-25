@@ -2,10 +2,15 @@ package frontend;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import common.AvailableMoves;
+import common.PositionData;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
 
@@ -17,9 +22,15 @@ public class GamePanel extends JPanel {
 	BufferedImage wPawnImages[] = new BufferedImage[8];
 	JLabel bPawns[] = new JLabel[8];
 	JLabel wPawns[] = new JLabel[8];
-
+	private GameControl gc;
+	
+	// TODO turn the piece images into static assets
+	
 	// Constructor for the initial panel.
 	public GamePanel(GameControl gc) {
+		this.gc = gc;
+		System.out.println(gc);
+		
 		// Initializing variables
 		JPanel display = new JPanel(new BorderLayout());
 		JLabel p1 = new JLabel("Player 1", JLabel.CENTER); // Can get username here
@@ -27,33 +38,51 @@ public class GamePanel extends JPanel {
 		JPanel board = new JPanel(new GridLayout(10, 10));
 		board.setPreferredSize(new Dimension(750, 750));
 
+		// FIXME TEST
+		ArrayList<PositionData> moves = new ArrayList<PositionData>();
+		moves.add(new PositionData(3, 5));
+		gc.setAvailableMoves(new AvailableMoves(moves));
+		
 		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+			for (int j = 0; j < 10; j++) {				
 				// Initializing loop varibales
 				squares[i][j] = new JPanel(new BorderLayout());
+				JPanel checker = squares[i][j];
+				checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
+				
+				AvailableMoves availableMoves = gc.getAvailableMoves();
+				
 				int row = j - 1;
 				int col = i - 1;
+				// TODO Make this a little more readable
+				if (availableMoves != null && availableMoves.getMoves().get(0).x == j && availableMoves.getMoves().get(0).y == i) {
+					checker.setBackground(Color.GREEN);
+				} 
 				// Setting light board panels
-				if ((i + j) % 2 == 0 && i > 0 && j > 0 && i < 9 && j < 9) {
-					squares[i][j].setBackground(Color.WHITE);
+				else if ((i + j) % 2 == 0 && i > 0 && j > 0 && i < 9 && j < 9) {
+					checker.setBackground(Color.WHITE);
 				}
 				// Creating dark board panels
 				else if ((i + j) % 2 == 1 && i > 0 && j > 0 && i < 9 && j < 9) {
-					squares[i][j].setBackground(Color.GRAY);
-				} else if ((i == 0 && j > 0 && j < 9) || (i == 9 && j > 0 && j < 9)) {
+					checker.setBackground(Color.GRAY);
+				} 
+				// setting row identifiers
+				else if ((i == 0 && j > 0 && j < 9) || (i == 9 && j > 0 && j < 9)) {
 					alphaLabel[row] = new JLabel(alpha[row], JLabel.CENTER);
 					if (i == 0)
-						squares[i][j].add(alphaLabel[row], BorderLayout.SOUTH);
+						checker.add(alphaLabel[row], BorderLayout.SOUTH);
 					else
-						squares[i][j].add(alphaLabel[row], BorderLayout.NORTH);
-				} else if ((j == 0 && i > 0 && i < 9) || (j == 9 && i > 0 && i < 9)) {
+						checker.add(alphaLabel[row], BorderLayout.NORTH);
+				} 
+				// setting col identifiers
+				else if ((j == 0 && i > 0 && i < 9) || (j == 9 && i > 0 && i < 9)) {
 					alphaLabel[col] = new JLabel(num[col], JLabel.CENTER);
 					if (j == 0)
-						squares[i][j].add(alphaLabel[col], BorderLayout.EAST);
+						checker.add(alphaLabel[col], BorderLayout.EAST);
 					else
-						squares[i][j].add(alphaLabel[col], BorderLayout.WEST);
+						checker.add(alphaLabel[col], BorderLayout.WEST);
 				}
-				board.add(squares[i][j]);
+				board.add(checker);
 			}
 		}
 		// Creating variables
@@ -70,7 +99,6 @@ public class GamePanel extends JPanel {
 			// creating 8 black pawn pieces
 			for (int i = 0; i < 8; i++) {
 				bPawnImages[i] = ImageIO.read(new File("assets/bPawn.png"));
-
 			}
 
 			// Reading the white piece files

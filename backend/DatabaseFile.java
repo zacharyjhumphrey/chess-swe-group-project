@@ -1,5 +1,7 @@
 package backend;
 
+import common.Player;
+
 public class DatabaseFile{
 
 	public static boolean verify(String username, String password) {
@@ -10,7 +12,7 @@ public class DatabaseFile{
 		return null;
 	}
 
-	public static void add(User newUser) {
+	public static void add(Player newUser) {
 		// TODO Auto-generated method stub
 		
 	}
