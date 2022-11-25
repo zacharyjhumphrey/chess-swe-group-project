@@ -10,7 +10,7 @@ Frontend Owner - Seth DeWalt
 Database Owner - Miguel
 
 ## Running the code
-ocsf.jar and mysql-connector-java-5.1.40-bin.jar jar are in the root directory of the project. Without these here, the class path of the project (inside of the .bat files) won't work
+ocsf.jar and mysql-connector-java-5.1.40-bin.jar jar are expected to be in the root directory of the project. Without these here, the class path of the project (inside of the .bat files) won't work
 
 ## Contribution Process
 1. Pull the code down to your machine
