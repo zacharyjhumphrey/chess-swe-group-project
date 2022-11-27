@@ -14,5 +14,13 @@ public class PositionData implements Serializable {
 	public String toString() {
 		return x + ", " + y;
 	}
-
+	
+	@Override
+	public boolean equals(Object otherObj) {
+		if (!(otherObj instanceof PositionData)) {
+			return false;
+		}
+		PositionData other = (PositionData) otherObj;
+		return other.x == x && other.y == y;
+	}
 }
