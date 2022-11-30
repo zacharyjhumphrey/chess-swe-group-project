@@ -66,6 +66,7 @@ public class Client extends AbstractClient {
 		
 		if (arg0 instanceof AvailableMoves) {
 			AvailableMoves moves = (AvailableMoves) arg0;
+			System.out.println("recieved moves from server");
 			System.out.println(moves.getMoves().get(0));
 			gameControl.setAvailableMoves(moves);
 		}

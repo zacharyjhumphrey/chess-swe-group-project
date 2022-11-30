@@ -10,17 +10,16 @@ public abstract class PieceData implements Serializable {
 	private PositionData position;
 	private int value;
 	public boolean moved = false;
-	private String name;
 
 	// TODO Test color
-	public PieceData(Color color, int x, int y, String name) {
+	public PieceData(Color color, int x, int y, String type) {
 		this.color = color.name().toLowerCase();
 		this.position = new PositionData(x, y);
-		this.name = name;
+		this.type = type;
 	}
 	
 	public String getFilePath() {
-		return "assets/" + this.color + this.name + ".png";
+		return "assets/" + this.color + this.type + ".png";
 	}
 
 	public void setPosition(int x, int y) {
