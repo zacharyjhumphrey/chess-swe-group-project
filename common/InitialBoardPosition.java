@@ -11,9 +11,9 @@ public class InitialBoardPosition {
 		toReturn[2][0] = new Bishop(PieceColor.b, 2, 0);
 		toReturn[3][0] = new Queen(PieceColor.b, 3, 0);
 		toReturn[4][0] = new King(PieceColor.b, 4, 0);
-		toReturn[5][0] = new Bishop(PieceColor.b, 4, 0);
-		toReturn[6][0] = new Knight(PieceColor.b, 4, 0);
-		toReturn[7][0] = new Rook(PieceColor.b, 4, 0);
+		toReturn[5][0] = new Bishop(PieceColor.b, 5, 0);
+		toReturn[6][0] = new Knight(PieceColor.b, 6, 0);
+		toReturn[7][0] = new Rook(PieceColor.b, 7, 0);
 		for (int x = 0; x < 8; x++) {
 			toReturn[x][1] = new Pawn(PieceColor.b, x, 1);
 		}

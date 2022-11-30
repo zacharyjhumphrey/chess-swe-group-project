@@ -7,13 +7,9 @@ public class Pawn extends PieceData {
 		super(color, x, y, "Pawn");
 	}
 
+	// TODO this only works for white pieces
 	@Override
-	public AvailableMoves getAvailableMoves(Board board) {
-		// TODO Determine if the piece is pinned
-		if (isPinned(board)) {
-			return null;
-		}
-		
+	public AvailableMoves getAvailableMoves(Board board) {		
 		ArrayList<PositionData> toReturn = new ArrayList<>();
 		int x = this.position.x;
 

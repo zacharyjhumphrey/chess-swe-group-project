@@ -11,6 +11,7 @@ import common.PieceColor;
 import common.PieceData;
 import common.Player;
 import common.PositionData;
+import backend.GameWonData;
 
 public class Game {
 	private Board board = new Board();
@@ -20,37 +21,52 @@ public class Game {
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private Player currentPlayer;
-	
+	private boolean gameStarted = false;
+	// private PieceData[][] board = new PieceData[8][8];
+	// private String whiteName;
+	// private String blackName;
+	// private HashMap<List<Integer>, PieceData> pieces = new HashMap<List<Integer>,
+	// PieceData>();
+
 	public Game(Player white, Player black) {
 		this.whitePlayer = white;
 		this.blackPlayer = black;
 		this.currentPlayer = this.whitePlayer;
+		// initializeBoard();
+	}
+
+	public Player getWhitePlayer() {
+		return this.whitePlayer;
+	}
+	
+	public Player getBlackPlayer() {
+		return this.blackPlayer;
 	}
 	
 	public Player getCurrentPlayer() {
 		return this.currentPlayer;
 	}
-	
+
 	public Board getBoard() {
 		return board;
 	}
-	
+
 	public AvailableMoves getCurrentAvailableMoves() {
 		return this.currentAvailableMoves;
 	}
-		
+
 	public boolean isWhiteCurrentPlayer() {
 		return this.currentPlayer == this.whitePlayer;
 	}
-	
+
 	public boolean isBlackCurrentPlayer() {
 		return this.currentPlayer == this.blackPlayer;
 	}
-	
+
 	/**
-	 * TODO test
-	 * move piece, set current piece and moves to null
-	 * set current player to the other player
+	 * TODO test move piece, set current piece and moves to null set current player
+	 * to the other player
+	 * 
 	 * @param fromPos
 	 * @param toPos
 	 */
@@ -60,11 +76,11 @@ public class Game {
 		movePiece(fromPos, toPos);
 		this.currentPlayer = (this.isWhiteCurrentPlayer()) ? this.blackPlayer : this.whitePlayer;
 	}
-	
+
 	public void updateBoard(Board newBoard) {
 		board = newBoard;
 	}
-	
+
 	public AvailableMoves setCurrentPiece(PositionData pos) {
 		if (this.currentPlayer.getColor() != this.board.getPiece(pos).getColor()) {
 			return null;
@@ -74,17 +90,57 @@ public class Game {
 		this.currentPiece = this.board.getPiece(pos);
 		return moves;
 	}
-	
+
 	public void moveCurrentPieceToPosition(PositionData toPos) {
 		this.board.movePiece(this.currentPiece.getPosition(), toPos);
 	}
-	
+
 	public AvailableMoves getAvailableMoves(PositionData pos) {
 		return board.getPiece(pos).getAvailableMoves(board);
 	}
 
+	public boolean checkCollision(PositionData p) {
+		for (List<Integer> key : pieces.keySet()) {
+			if (key.get(0) == p.x) {
+				if (key.get(1) == p.y) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public HashMap<List<Integer>, PieceData> getPieces() {
 		return pieces;
+	}
+
+	public GameWonData winGame() {
+		GameWonData win = new GameWonData();
+		return win;
+	}
+
+	public GameTieData tieGame() {
+		GameTieData tie = new GameTieData();
+		return tie;
+	}
+
+	public GameLostData loseGame() {
+		GameLostData lose = new GameLostData();
+		return lose;
+	}
+
+	public WaitForGameData waitUser() {
+		WaitForGameData wait = new WaitForGameData();
+		return wait;
+	}
+
+	public GameInfoData sendGameInfo() {
+		GameInfoData info = new GameInfoData(this.whitePlayer.getUsername(), this.blackPlayer.getUsername());
+		return info;
+	}
+
+	public void startGame() {
+		gameStarted = true;
 	}
 
 	// TODO I believe this is printing the board sideways, plz fix
@@ -93,7 +149,8 @@ public class Game {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (board.getPiece(i, j) != null) {
-					String t = String.format("%10s", board.getPiece(i, j).getColorAsString() + "," + board.getPiece(i, j).getClass());
+					String t = String.format("%10s",
+							board.getPiece(i, j).getColorAsString() + "," + board.getPiece(i, j).getClass());
 					r += "|" + t + "|";
 				} else {
 					String t = String.format("%10s", "NULL");

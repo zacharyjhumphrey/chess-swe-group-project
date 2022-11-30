@@ -11,36 +11,15 @@ public abstract class PieceData implements Serializable {
 	private String name;
 	private boolean removed = false;
 
+	// TODO remove name
 	public PieceData(PieceColor color, int x, int y, String name) {
 		this.color = color;
 		this.position = new PositionData(x, y);
-		this.name = name;
+		this.type = type;
 	}
 	
-	// TODO test
-	public boolean isPinned(Board board) {
-//		if (this instanceof King) {
-//			return false;
-//		}
-//		
-//		King king = (this.getColor() == PieceColor.w) ? board.getWhiteKing() : board.getBlackKing();
-//		PositionData kingPos = king.getPosition();
-//		PositionData pos = getPosition();
-//		boolean interceptsVertical = false;
-//		
-//		
-//		if (pos.x == kingPos.x) {
-//			// get vertical spaces between two enemies or between the king [ex: (king, null, null, Pawn) or (Rook, null, null, King, Pawn)
-//			// 
-//		}
-//		
-//		// if 
-		
-		return false;
-	}
-
 	public String getFilePath() {
-		return "assets/" + this.color + this.name + ".png";
+		return "assets/" + this.color + this.type + ".png";
 	}
 
 	public void setPosition(int x, int y) {

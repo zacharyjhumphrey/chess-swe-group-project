@@ -41,6 +41,7 @@ public class CheckerMouseListener implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		gc.sendCheckerClickedToServer(pos);
+		System.out.println(pos);
 	}
 
 }
