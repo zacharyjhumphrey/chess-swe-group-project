@@ -1,10 +1,3 @@
-<<<<<<< Updated upstream
-package backend;
-// TODO
-public class GameTest {
-
-}
-=======
 package backend;
 
 import java.io.IOException;
@@ -82,4 +75,3 @@ public class GameTest {
 	}
 
 }
->>>>>>> Stashed changes
