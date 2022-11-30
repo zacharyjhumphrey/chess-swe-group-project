@@ -1,19 +1,19 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class PieceData implements Serializable {
-	private String color;
+	private PieceColor color;
 	private String type;
-	private PositionData position;
+	protected PositionData position;
 	private int value;
 	public boolean moved = false;
+	private String name;
+	private boolean removed = false;
 
-	// TODO Test color
-	public PieceData(Color color, int x, int y, String type) {
-		this.color = color.name().toLowerCase();
+	// TODO remove name
+	public PieceData(PieceColor color, int x, int y, String name) {
+		this.color = color;
 		this.position = new PositionData(x, y);
 		this.type = type;
 	}
@@ -35,17 +35,36 @@ public abstract class PieceData implements Serializable {
 		return type;
 	}
 
-	public String getColor() {
+	public String getColorAsString() {
+		return color.name().toLowerCase();
+	}
+	
+	public PieceColor getColor() {
 		return color;
 	}
 
+	@Override
 	public String toString() {
 		return color + "," + type + " | position (" + position.toString() + ")";
 	}
 
-}
+	public AvailableMoves getAvailableMoves(Board b) {
+		return null;
+	}
 
-enum Color {
-	b,
-	w
+	public boolean onSameTeam(PieceData piece) {
+		if (piece == null) {
+			return false;
+		}
+		return piece.color.equals(this.color);
+	}
+
+	public boolean isValidPosition(PositionData pos) {
+		return pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8;
+	}
+
+	public void removeFromBoard() {
+		removed = true;
+		this.position = null;
+	}
 }

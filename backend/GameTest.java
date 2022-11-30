@@ -3,7 +3,8 @@ package backend;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
+import common.*;
+import frontend.Client;
 
 public class GameTest {
 
@@ -32,31 +33,26 @@ public class GameTest {
 			e1.printStackTrace();
 		}
 
-		
-		Player p1 = new Player("player1","password");
-		Player p2 = new Player("player2","password");
+		Player p1 = new Player("player1", "password");
+		Player p2 = new Player("player2", "password");
 		StartData p1s = new StartData(p1);
 		StartData p2s = new StartData(p2);
-		
+
 		try {
 			client1.sendToServer(p1s);
-			//client2.sendToServer(p2s);
+			// client2.sendToServer(p2s);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
+
 		try {
 			client2.sendToServer(p2s);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
-		
-		
+
 		// close client and server
 		try {
 			client1.closeConnection();

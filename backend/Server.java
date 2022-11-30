@@ -1,19 +1,13 @@
 package backend;
 
-import ocsf.*;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
-import javax.swing.*;
 import database.Database;
-import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.List;
 import common.AvailableMoves;
 import common.CommunicationError;
 import common.CreateAccountData;
@@ -23,19 +17,20 @@ import common.Player;
 import common.PositionData;
 import common.StartData;
 
+// TODO we need to actually get two players connected to the same game
 public class Server extends AbstractServer {
 	private Database database;
 	private Queue<Player> userswaitingforgame = new LinkedList<>();
 	private PieceData currentPiece;
 	private Game currentGame;
-	private HashMap<Integer,Game> games = new HashMap<Integer,Game>();
+	private HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 
 	public Server() {
 		super(8300);
-		currentGame = new Game();
+		currentGame = new Game(null, null);
 		database = new Database();
 	}
-	
+
 	public Server(int port) {
 		super(port);
 		database = new Database();
@@ -50,7 +45,6 @@ public class Server extends AbstractServer {
 		}
 	}
 
-	
 	public Game getGame() {
 		return currentGame;
 	}
@@ -63,7 +57,6 @@ public class Server extends AbstractServer {
 	protected void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 
 		if (arg0 instanceof CreateAccountData) {
-
 			CreateAccountData createAccountData = (CreateAccountData) arg0;
 
 			// checks if username dose not exist
@@ -114,480 +107,110 @@ public class Server extends AbstractServer {
 		}
 
 		if (arg0 instanceof StartData) {
-
 			StartData startData = (StartData) arg0;
 			System.out.println("start data recieved");
 			userswaitingforgame.add(startData.getUser());
-			if (userswaitingforgame.size()>=2) {
-				currentGame = new Game();
-				currentGame.setBlack( userswaitingforgame.remove().getUsername());
-				currentGame.setWhite( userswaitingforgame.remove().getUsername());
-				int gameId = (int)(Math.random()*999999);
+			if (userswaitingforgame.size() >= 2) {
+				// FIXME get player references
+				currentGame = new Game(userswaitingforgame.remove(), userswaitingforgame.remove());
+				int gameId = (int) (Math.random() * 999999);
 				games.put(gameId, currentGame);
 				currentGame.startGame();
 				System.out.println(currentGame.toString());
-				System.out.println("white: "+currentGame.getWhite());
-				System.out.println("black: "+currentGame.getBlack());
+				System.out.println("white: " + currentGame.getWhitePlayer().getUsername());
+				System.out.println("black: " + currentGame.getBlackPlayer().getUsername());
 			} else {
-			System.out.println(startData.getUser().getUsername()+" is waiting");
-			try {
-				arg1.sendToClient(currentGame.waitUser());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				System.out.println(startData.getUser().getUsername() + " is waiting");
+				try {
+					arg1.sendToClient(currentGame.waitUser());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-			
-			
 
+		// user clicks on a checker on the board
 		if (arg0 instanceof PositionData) {
 			PositionData pos = (PositionData) arg0;
 			System.out.println("position data has been recieved: " + pos.x + ", " + pos.y);
-			//does position contain a piece
-			
 			PositionData position = (PositionData) arg0;
-			if(currentGame.getPieces().containsKey(Arrays.asList(position.x,position.y))) {
-				currentPiece = currentGame.getPieces().get(Arrays.asList(position.x,position.y));
-				PositionData p;
-				ArrayList<PositionData> moves = new ArrayList<PositionData>();
-				int x = currentPiece.getPosition().x;
-				int y = currentPiece.getPosition().y;
-				int offset = 0;
-				switch (currentPiece.getType()) {
-				case "Rook":
-					System.out.println("rook pressed");
-					p = new PositionData(x-1,y);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x-offset,y);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x+1,y);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x+offset,y);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x,y+offset);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x,y-offset);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					break;
-				case "Knight":
-					System.out.println("Knight pressed");
-					p = new PositionData(x+2,y+1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x+2,y-1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-2,y+1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-2,y-1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-		
-					p = new PositionData(x+1,y+2);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x+1,y-2);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-1,y+2);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-1,y-2);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					break;
-				case "Bishop":
-					System.out.println("bishop pressed");
-					p = new PositionData(x+1,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x+offset, y+offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x-1,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x-offset, y-offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x-1,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x-offset, y+offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x+1,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x+offset, y-offset);
-						offset++;
-					}
-					}
-					break;
-				case "Queen":
-					System.out.println("queen pressed");
-					
-					p = new PositionData(x+1,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x+offset, y+offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x-1,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x-offset, y-offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x-1,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x-offset, y+offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x+1,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-						offset=2;
-						while(currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-							moves.add(p);
-								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-									moves.add(p);
-								} else {
-									break;
-								}
-						p = new PositionData(x+offset, y-offset);
-						offset++;
-					}
-					}
-					
-					p = new PositionData(x-1,y);
-					if(currentGame.inbounds(p.x, p.y)) {
-					//System.out.println(currentGame.inbounds(p.x, p.y));
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x-offset,y);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x+1,y);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x+offset,y);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x,y+1);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x,y+offset);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					
-					p = new PositionData(x,y-1);
-					if(currentGame.inbounds(p.x, p.y)) {
-					offset = 2;
-					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
-					moves.add(p);
-					p = new PositionData(x,y-offset);
-					offset++;
-					}
-					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
-							&& currentGame.inbounds(p.x, p.y)) {
-						moves.add(p);
-					}
-					}
-					break;
-				case "King":
-					System.out.println("king pressed");
-					p = new PositionData(x+1,y);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x+1,y-1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x+1,y+1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-1,y);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-		
-					p = new PositionData(x-1,y+1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x-1,y-1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x,y+1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					p = new PositionData(x,y-1);
-					if (currentGame.inbounds(p.x, p.y)) {
-						if(!currentGame.checkCollision(p)) {
-					moves.add(p);
-						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
-							moves.add(p);
-						}
-					}
-					break;
-				case ("Pawn"):
-					switch (currentPiece.getColor()) {
-					case "w":
-						p = new PositionData(x-1, y);
-						if (!currentGame.checkCollision(p)) {
-							moves.add(p);
-						}
-						if (!currentPiece.moved) {
-							p = new PositionData(x-2, y);
-							if (!currentGame.checkCollision(p)) {
-								moves.add(p);
-							}
-						}
-						break;
-					case "b":
-						p = new PositionData(x+1, y);
-						if (!currentGame.checkCollision(p)) {
-							moves.add(p);
-						}
-						if (!currentPiece.moved) {
-							p = new PositionData(x+2, y);
-							if (!currentGame.checkCollision(p)) {
-								moves.add(p);
-							}
-						}
-						break;
-					}
-					break;
+			AvailableMoves moves = this.currentGame.getCurrentAvailableMoves();
+
+			// only accept valid positions
+			if (!position.inbounds()) {
+				try {
+					// TODO send board to both clients in users' game
+					arg1.sendToClient(null);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				AvailableMoves movelist = new AvailableMoves(moves);
-				System.out.println(moves);
-				
-				//not working
-//				try {
-//					arg1.sendToClient(movelist);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					System.out.println("failed to send available moves to client");
-//					e.printStackTrace();
-//				}
-				
-			} else {
-				System.out.println("blank space");
 			}
-			
-			
+
+			// if the user clicks on an availableMove checker
+			if (moves != null && moves.containsPosition(position)) {
+				// move the current piece
+				this.currentGame.moveCurrentPieceToPosition(position);
+				try {
+					// TODO send board to both clients in users' game
+					arg1.sendToClient(this.currentGame.getBoard());
+					// TODO if win, send win/loss to both clients
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				return;
+			}
+
+			// if the user clicks on an empty space or a new piece
+			moves = this.currentGame.setCurrentPiece(position);
+
+			try {
+				arg1.sendToClient(moves);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("failed to send available moves to client");
+				e.printStackTrace();
+			}
 
 		}
-		
 
+	}
+
+	// Before this todo is implemented, we need to consider the use case of
+	// selecting a new piece to move
+	// TODO check that the position is valid. send error to user if is not.
+	// (inbounds, position is not occupied by friendly piece)
+	// if so
+	// remove the opposing piece
+	// update the board for both players
+
+	private void userClickedPosition(ConnectionToClient conn, PositionData clickedPosition) {
+		AvailableMoves movesForCurrentPiece = this.currentGame.getCurrentAvailableMoves();
+		Player currentPlayer = this.currentGame.getCurrentPlayer();
+//		Player clientPlayer = this.playersMap.get(conn.id);
+//		if (clientPlayer != currentPlayer) {
+//			conn.sendtoClient(new Error("wait your turn"));
+//		}
+
+		if (movesForCurrentPiece == null || !movesForCurrentPiece.containsPosition(clickedPosition)) {
+			try {
+				conn.sendToClient(this.currentGame.setCurrentPiece(clickedPosition));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
+
+		this.currentGame.moveCurrentPieceToPosition(clickedPosition);
+		try {
+			conn.sendToClient(this.currentGame.getBoard());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void listeningException(Throwable exception) {
