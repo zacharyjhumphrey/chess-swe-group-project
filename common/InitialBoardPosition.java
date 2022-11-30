@@ -1,33 +1,10 @@
 package common;
 
-import java.util.ArrayList;
+import java.util.List;
 
+// TODO Deprecate
 public class InitialBoardPosition {
 	public static PieceData[][] getBoardStartingPosition() {
-//		Class[][] positions = {
-//				{ Rook.class, Knight.class, Bishop.class, Queen.class, King.class, Bishop.class, Knight.class, Rook.class }, 
-//				{ Pawn.class, Pawn.class,   Pawn.class,   Pawn.class,  Pawn.class, Pawn.class, 	 Pawn.class,   Pawn.class }, 
-//				{ null, 	  null, 		null, 		  null,		   null,  	   null, 	     null, 		   null }, 
-//				{ null, 	  null, 		null, 		  null,		   null,  	   null, 	     null, 		   null }, 
-//				{ null, 	  null, 		null, 		  null,		   null,  	   null, 	     null, 		   null }, 
-//				{ null, 	  null, 		null, 		  null,		   null,  	   null, 	     null, 		   null }, 
-//				{ Pawn.class, Pawn.class,   Pawn.class,   Pawn.class,  Pawn.class, Pawn.class, 	 Pawn.class,   Pawn.class }, 
-//				{ Rook.class, Knight.class, Bishop.class, Queen.class, King.class, Bishop.class, Knight.class, Rook.class }, 
-//		};
-//		
-//		PieceData[][] toReturn = new PieceData[8][8];
-//		
-//		for (int x = 0; x < 8; x++) {
-//			for (int y = 0; y < 8; y++) {
-//				Class pieceClass = positions[x][y];
-//				if (pieceClass == null) {
-//					continue;
-//				}
-//				TODO this approach could work, just need to figure out this last part
-//				toReturn[x][y] = new pieceClass(Color.w, 0, 0);
-//			}
-//		}
-		
 		PieceData[][] toReturn = new PieceData[8][8];
 		toReturn[0][0] = new Rook(PieceColor.b, 0, 0);
 		toReturn[1][0] = new Knight(PieceColor.b, 1, 0);
@@ -40,7 +17,7 @@ public class InitialBoardPosition {
 		for (int x = 0; x < 8; x++) {
 			toReturn[x][1] = new Pawn(PieceColor.b, x, 1);
 		}
-		
+
 		for (int x = 0; x < 8; x++) {
 			toReturn[x][6] = new Pawn(PieceColor.w, x, 6);
 		}

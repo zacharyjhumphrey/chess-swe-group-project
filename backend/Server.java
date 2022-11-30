@@ -1,20 +1,9 @@
 package backend;
 
-import ocsf.server.AbstractServer;
-import ocsf.server.ConnectionToClient;
-import javax.swing.*;
-
-import database.Database;
-
-import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import common.AvailableMoves;
 import common.CommunicationError;
@@ -24,13 +13,19 @@ import common.PieceData;
 import common.Player;
 import common.PositionData;
 import common.StartData;
+import database.Database;
+import ocsf.server.AbstractServer;
+import ocsf.server.ConnectionToClient;
 
+// TODO we need to actually get two players connected to the same game
 public class Server extends AbstractServer {
 	private Database database;
 	private Queue<Object> userswaitingforgame = new LinkedList<>();
 	private PieceData pieceData;
 	private PieceData currentPiece;
-	private Game gameBoard = new Game();
+	
+	// FIXME
+	private Game game = new Game(null, null);
 
 	public Server() {
 		super(8300);
@@ -52,7 +47,7 @@ public class Server extends AbstractServer {
 	}
 
 	public Game getGame() {
-		return gameBoard;
+		return game;
 	}
 
 	public PieceData getCurrentPiece() {
@@ -63,7 +58,6 @@ public class Server extends AbstractServer {
 	protected void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 
 		if (arg0 instanceof CreateAccountData) {
-
 			CreateAccountData createAccountData = (CreateAccountData) arg0;
 
 			// checks if username dose not exist
@@ -114,7 +108,6 @@ public class Server extends AbstractServer {
 		}
 
 		if (arg0 instanceof StartData) {
-
 			StartData startData = (StartData) arg0;
 			userswaitingforgame.add(startData.getUser());
 
@@ -213,24 +206,45 @@ public class Server extends AbstractServer {
 //			System.out.println(moves.toString());
 //		}
 
+		// user clicks on a checker on the board
 		if (arg0 instanceof PositionData) {
 			PositionData pos = (PositionData) arg0;
 			System.out.println("position data has been recieved: " + pos.x + ", " + pos.y);
-			// when user selects move to make
 			PositionData position = (PositionData) arg0;
-			ArrayList<PositionData> moves = new ArrayList<PositionData>();
-			moves.add(new PositionData(6, 6));
+			AvailableMoves moves = this.game.getCurrentAvailableMoves();
 			
-//			// verifies location is valid
-//			List<Integer> oldp = Arrays.asList(currentPiece.getPosition().x, currentPiece.getPosition().y);
-//			List<Integer> newp = Arrays.asList(position.x, position.y);
-//			currentPiece.setPosition(position.x, position.y);
-//			gameBoard.getPieces().remove(oldp);
-//			gameBoard.getPieces().put(newp, currentPiece);
-//			// updates game to show piece has been moved
-//			gameBoard.updateBoard();
+			// only accept valid positions
+			if (!position.inbounds()) {
+				try {
+					// TODO send board to both clients in users' game
+					arg1.sendToClient(null);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			// if the user clicks on an availableMove checker
+			if (moves != null && moves.containsPosition(position)) {
+				// move the current piece
+				this.game.moveCurrentPieceToPosition(position);
+				try {
+					// TODO send board to both clients in users' game
+					arg1.sendToClient(this.game.getBoard());
+					// TODO if win, send win/loss to both clients
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				return;
+			}
+
+			// if the user clicks on an empty space or a new piece
+			moves = this.game.setCurrentPiece(position);
+			
 			try {
-				arg1.sendToClient(new AvailableMoves(moves));
+				arg1.sendToClient(moves);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				System.out.println("failed to send available moves to client");
@@ -241,6 +255,39 @@ public class Server extends AbstractServer {
 
 	}
 
+	// Before this todo is implemented, we need to consider the use case of selecting a new piece to move
+	// TODO check that the position is valid. send error to user if is not. (inbounds, position is not occupied by friendly piece)
+	// if so
+		// remove the opposing piece
+	// update the board for both players
+	
+	private void userClickedPosition(ConnectionToClient conn, PositionData clickedPosition) {
+		AvailableMoves movesForCurrentPiece = this.game.getCurrentAvailableMoves();
+		Player currentPlayer = this.game.getCurrentPlayer();
+//		Player clientPlayer = this.playersMap.get(conn.id);
+//		if (clientPlayer != currentPlayer) {
+//			conn.sendtoClient(new Error("wait your turn"));
+//		}
+		
+		if (movesForCurrentPiece == null || !movesForCurrentPiece.containsPosition(clickedPosition)) {
+			try {
+				conn.sendToClient(this.game.setCurrentPiece(clickedPosition));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
+		
+		this.game.moveCurrentPieceToPosition(clickedPosition);
+		try {
+			conn.sendToClient(this.game.getBoard());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	protected void listeningException(Throwable exception) {
 		System.out.println("Listening Exception:" + exception);
 		exception.printStackTrace();

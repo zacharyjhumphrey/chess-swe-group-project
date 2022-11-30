@@ -1,8 +1,6 @@
 package backend;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class testServer {
 
@@ -29,9 +27,6 @@ public class testServer {
 //			// TODO Auto-generated catch block
 //			e1.printStackTrace();
 //		}
-//
-//		// initialize server gameboard
-//		server.getGame().initializeBoard();
 //
 //		// send piecedata to server
 //		try {

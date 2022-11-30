@@ -1,24 +1,44 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class PieceData implements Serializable {
-	private String color;
+	private PieceColor color;
 	private String type;
 	protected PositionData position;
 	private int value;
 	public boolean moved = false;
 	private String name;
+	private boolean removed = false;
 
-	// TODO Test color
 	public PieceData(PieceColor color, int x, int y, String name) {
-		this.color = color.name().toLowerCase();
+		this.color = color;
 		this.position = new PositionData(x, y);
 		this.name = name;
 	}
 	
+	// TODO test
+	public boolean isPinned(Board board) {
+//		if (this instanceof King) {
+//			return false;
+//		}
+//		
+//		King king = (this.getColor() == PieceColor.w) ? board.getWhiteKing() : board.getBlackKing();
+//		PositionData kingPos = king.getPosition();
+//		PositionData pos = getPosition();
+//		boolean interceptsVertical = false;
+//		
+//		
+//		if (pos.x == kingPos.x) {
+//			// get vertical spaces between two enemies or between the king [ex: (king, null, null, Pawn) or (Rook, null, null, King, Pawn)
+//			// 
+//		}
+//		
+//		// if 
+		
+		return false;
+	}
+
 	public String getFilePath() {
 		return "assets/" + this.color + this.name + ".png";
 	}
@@ -36,52 +56,36 @@ public abstract class PieceData implements Serializable {
 		return type;
 	}
 
-	public String getColor() {
+	public String getColorAsString() {
+		return color.name().toLowerCase();
+	}
+	
+	public PieceColor getColor() {
 		return color;
 	}
 
+	@Override
 	public String toString() {
 		return color + "," + type + " | position (" + position.toString() + ")";
 	}
-	
+
 	public AvailableMoves getAvailableMoves(Board b) {
-//		ArrayList<PositionData> moves = new ArrayList<PositionData>();
-//		PositionData currentPos = this.position;
-//		moves.add(b[currentPos.x][currentPos.y].getPosition());
-//		return new AvailableMoves(moves);
 		return null;
 	}
-	
+
 	public boolean onSameTeam(PieceData piece) {
+		if (piece == null) {
+			return false;
+		}
 		return piece.color.equals(this.color);
 	}
-	
+
 	public boolean isValidPosition(PositionData pos) {
 		return pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8;
 	}
-	
-	private ArrayList<PositionData> getVerticalMoves(PieceData[][] board) {
-		ArrayList<PositionData> toReturn = new ArrayList<PositionData>();
-		int x = this.position.x;
-		
-		// Get positions below piece
-		for (int y = this.position.y; y < board.length; y++) {
-			PieceData currentPiece = board[x][y];
-			
-			if (currentPiece == null) {
-				toReturn.add(new PositionData(x, y));
-				continue;
-			}
-			
-			if (!this.onSameTeam(currentPiece)) {
-				toReturn.add(new PositionData(x, y));
-			}
-			
-			break;
-		}
-		return toReturn;
-	}
-	
-	
 
+	public void removeFromBoard() {
+		removed = true;
+		this.position = null;
+	}
 }
