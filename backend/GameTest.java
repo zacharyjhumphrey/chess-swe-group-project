@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import common.Player;
-import common.PositionData;
-import common.StartData;
-import frontend.Client;
 
 public class GameTest {
 

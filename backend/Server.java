@@ -1,11 +1,10 @@
 package backend;
 
+import ocsf.*;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 import javax.swing.*;
-
 import database.Database;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.List;
-
 import common.AvailableMoves;
 import common.CommunicationError;
 import common.CreateAccountData;
@@ -27,13 +25,19 @@ import common.StartData;
 
 public class Server extends AbstractServer {
 	private Database database;
-	private Queue<Object> userswaitingforgame = new LinkedList<>();
-	private PieceData pieceData;
+	private Queue<Player> userswaitingforgame = new LinkedList<>();
 	private PieceData currentPiece;
-	private Game gameBoard = new Game();
+	private Game currentGame;
+	private HashMap<Integer,Game> games = new HashMap<Integer,Game>();
 
 	public Server() {
 		super(8300);
+		currentGame = new Game();
+		database = new Database();
+	}
+	
+	public Server(int port) {
+		super(port);
 		database = new Database();
 	}
 
@@ -46,13 +50,9 @@ public class Server extends AbstractServer {
 		}
 	}
 
-	public Server(int port) {
-		super(port);
-		database = new Database();
-	}
-
+	
 	public Game getGame() {
-		return gameBoard;
+		return currentGame;
 	}
 
 	public PieceData getCurrentPiece() {
@@ -116,128 +116,477 @@ public class Server extends AbstractServer {
 		if (arg0 instanceof StartData) {
 
 			StartData startData = (StartData) arg0;
+			System.out.println("start data recieved");
 			userswaitingforgame.add(startData.getUser());
-
-			// when user clicks to start game/ start searching for game
-			// takes in startData.user
-			// adds user to que to find game
-
-			// plan on adding function to check if size of que is greater than or equal to 2
-			// then pop of 2 users and pair
-			// them to play in game together
-
+			if (userswaitingforgame.size()>=2) {
+				currentGame = new Game();
+				currentGame.setBlack( userswaitingforgame.remove().getUsername());
+				currentGame.setWhite( userswaitingforgame.remove().getUsername());
+				int gameId = (int)(Math.random()*999999);
+				games.put(gameId, currentGame);
+				currentGame.startGame();
+				System.out.println(currentGame.toString());
+				System.out.println("white: "+currentGame.getWhite());
+				System.out.println("black: "+currentGame.getBlack());
+			} else {
+			System.out.println(startData.getUser().getUsername()+" is waiting");
+			try {
+				arg1.sendToClient(currentGame.waitUser());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
 		}
-
-//		if (arg0 instanceof PieceData) {
-//
-//			PieceData pieceData = (PieceData) arg0;
-//			currentPiece = pieceData;
-//			List<PositionData> moves = new ArrayList<PositionData>();
-//			int x = pieceData.getPosition().x;
-//			int y = pieceData.getPosition().y;
-//			int offset = 0;
-//			PositionData p;
-//			System.out.println("x: " + x + ", y: " + y);
-//			switch (pieceData.getColor()) {
-//			case ("w"):
-//				switch (pieceData.getType()) {
-//				case "pawn":
-//					p = new PositionData(x, y - 1);
-//					if (!gameBoard.checkCollision(p)) {
-//						moves.add(p);
-//					}
-//					if (!pieceData.moved) {
-//						p = new PositionData(x, y - 2);
-//						if (!gameBoard.checkCollision(p)) {
-//							moves.add(p);
-//						}
-//					}
-//					break;
-//				case "rook":
-//					offset = 1;
-//					p = new PositionData(x, y - offset);
-//					while (!gameBoard.checkCollision(p)) {
-//						moves.add(p);
-//						offset++;
-//						p = new PositionData(x, y - offset);
-//					}
-//					if (gameBoard.getPieces().get(Arrays.asList(p.x, p.y)).getColor() != "w") {
-//						moves.add(p);
-//					}
-//					break;
-//				case "knight":
-//					break;
-//				case "bishop":
-//					break;
-//				case "queen":
-//					break;
-//				case "king":
-//					break;
-//				}
-//				break;
-//			case ("b"):
-//				switch (pieceData.getType()) {
-//				case "pawn":
-//					p = new PositionData(x, y + 1);
-//					moves.add(p);
-//					if (!pieceData.moved) {
-//						p = new PositionData(x, y + 2);
-//						moves.add(p);
-//					}
-//					break;
-//				case "rook":
-//					offset = 1;
-//					p = new PositionData(x, y + offset);
-//					while (!gameBoard.checkCollision(p)) {
-//						moves.add(p);
-//						offset++;
-//						p = new PositionData(x, y + offset);
-//					}
-//					if (gameBoard.getPieces().get(Arrays.asList(p.x, p.y)).getColor() != "b") {
-//						moves.add(p);
-//					}
-//
-//					break;
-//				case "knight":
-//					break;
-//				case "bishop":
-//					break;
-//				case "queen":
-//					break;
-//				case "king":
-//					break;
-//				}
-//				break;
-//			}
-//			// send array list to user
-//			System.out.println(moves.toString());
-//		}
+			
+			
 
 		if (arg0 instanceof PositionData) {
 			PositionData pos = (PositionData) arg0;
 			System.out.println("position data has been recieved: " + pos.x + ", " + pos.y);
-			// when user selects move to make
-			PositionData position = (PositionData) arg0;
-			ArrayList<PositionData> moves = new ArrayList<PositionData>();
-			moves.add(new PositionData(6, 6));
+			//does position contain a piece
 			
-//			// verifies location is valid
-//			List<Integer> oldp = Arrays.asList(currentPiece.getPosition().x, currentPiece.getPosition().y);
-//			List<Integer> newp = Arrays.asList(position.x, position.y);
-//			currentPiece.setPosition(position.x, position.y);
-//			gameBoard.getPieces().remove(oldp);
-//			gameBoard.getPieces().put(newp, currentPiece);
-//			// updates game to show piece has been moved
-//			gameBoard.updateBoard();
-			try {
-				arg1.sendToClient(new AvailableMoves(moves));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("failed to send available moves to client");
-				e.printStackTrace();
+			PositionData position = (PositionData) arg0;
+			if(currentGame.getPieces().containsKey(Arrays.asList(position.x,position.y))) {
+				currentPiece = currentGame.getPieces().get(Arrays.asList(position.x,position.y));
+				PositionData p;
+				ArrayList<PositionData> moves = new ArrayList<PositionData>();
+				int x = currentPiece.getPosition().x;
+				int y = currentPiece.getPosition().y;
+				int offset = 0;
+				switch (currentPiece.getType()) {
+				case "Rook":
+					System.out.println("rook pressed");
+					p = new PositionData(x-1,y);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x-offset,y);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x+1,y);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x+offset,y);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x,y+offset);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x,y-offset);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					break;
+				case "Knight":
+					System.out.println("Knight pressed");
+					p = new PositionData(x+2,y+1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x+2,y-1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-2,y+1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-2,y-1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+		
+					p = new PositionData(x+1,y+2);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x+1,y-2);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-1,y+2);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-1,y-2);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					break;
+				case "Bishop":
+					System.out.println("bishop pressed");
+					p = new PositionData(x+1,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x+offset, y+offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x-1,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x-offset, y-offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x-1,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x-offset, y+offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x+1,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x+offset, y-offset);
+						offset++;
+					}
+					}
+					break;
+				case "Queen":
+					System.out.println("queen pressed");
+					
+					p = new PositionData(x+1,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x+offset, y+offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x-1,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x-offset, y-offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x-1,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x-offset, y+offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x+1,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+						offset=2;
+						while(currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+							moves.add(p);
+								} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+									moves.add(p);
+								} else {
+									break;
+								}
+						p = new PositionData(x+offset, y-offset);
+						offset++;
+					}
+					}
+					
+					p = new PositionData(x-1,y);
+					if(currentGame.inbounds(p.x, p.y)) {
+					//System.out.println(currentGame.inbounds(p.x, p.y));
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x-offset,y);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x+1,y);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x+offset,y);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x,y+1);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x,y+offset);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					
+					p = new PositionData(x,y-1);
+					if(currentGame.inbounds(p.x, p.y)) {
+					offset = 2;
+					while(!currentGame.checkCollision(p) && currentGame.inbounds(p.x, p.y)) {
+					moves.add(p);
+					p = new PositionData(x,y-offset);
+					offset++;
+					}
+					if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())
+							&& currentGame.inbounds(p.x, p.y)) {
+						moves.add(p);
+					}
+					}
+					break;
+				case "King":
+					System.out.println("king pressed");
+					p = new PositionData(x+1,y);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x+1,y-1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x+1,y+1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-1,y);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+		
+					p = new PositionData(x-1,y+1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x-1,y-1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x,y+1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					p = new PositionData(x,y-1);
+					if (currentGame.inbounds(p.x, p.y)) {
+						if(!currentGame.checkCollision(p)) {
+					moves.add(p);
+						} else if(!currentPiece.getColor().equals(currentGame.getPieces().get(Arrays.asList(p.x,p.y)).getColor())){
+							moves.add(p);
+						}
+					}
+					break;
+				case ("Pawn"):
+					switch (currentPiece.getColor()) {
+					case "w":
+						p = new PositionData(x-1, y);
+						if (!currentGame.checkCollision(p)) {
+							moves.add(p);
+						}
+						if (!currentPiece.moved) {
+							p = new PositionData(x-2, y);
+							if (!currentGame.checkCollision(p)) {
+								moves.add(p);
+							}
+						}
+						break;
+					case "b":
+						p = new PositionData(x+1, y);
+						if (!currentGame.checkCollision(p)) {
+							moves.add(p);
+						}
+						if (!currentPiece.moved) {
+							p = new PositionData(x+2, y);
+							if (!currentGame.checkCollision(p)) {
+								moves.add(p);
+							}
+						}
+						break;
+					}
+					break;
+				}
+				AvailableMoves movelist = new AvailableMoves(moves);
+				System.out.println(moves);
+				
+				//not working
+//				try {
+//					arg1.sendToClient(movelist);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					System.out.println("failed to send available moves to client");
+//					e.printStackTrace();
+//				}
+				
+			} else {
+				System.out.println("blank space");
 			}
+			
+			
 
 		}
+		
 
 	}
 
