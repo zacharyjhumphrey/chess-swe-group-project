@@ -30,7 +30,7 @@ public class GamePanel extends JPanel {
 	public GamePanel(GameControl gc) {
 		this.gc = gc;
 		System.out.println(gc);
-
+		this.setSize(900,900);
 		// Initializing Panels
 		JPanel display = new JPanel(new BorderLayout());
 		JPanel top = new JPanel(new FlowLayout());
@@ -47,7 +47,6 @@ public class GamePanel extends JPanel {
 		JButton logout = new JButton("Log Out");
 		logout.addActionListener(gc);
 
-
 		// FIXME TEST
 		ArrayList<PositionData> moves = new ArrayList<PositionData>();
 		moves.add(new PositionData(3, 5));
@@ -57,28 +56,35 @@ public class GamePanel extends JPanel {
 			for (int j = 0; j < 10; j++) {				
 				// Initializing loop variables
 				squares[i][j] = new JPanel(new BorderLayout());
+				
 				JPanel checker = squares[i][j];
-				checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
-
+				if(i>0 && i<9 && j>0 && i<9)
+				{
+					checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
+				}
 				AvailableMoves availableMoves = gc.getAvailableMoves();
-
+				
 				int row = j - 1;
 				int col = i - 1;
+				Color dark = new Color(102, 76, 131);
+				Color light = new Color(179, 160, 200);
+				
 				// TODO Make this a little more readable
 				if (availableMoves != null && availableMoves.getMoves().get(0).x == j && availableMoves.getMoves().get(0).y == i) {
 					checker.setBackground(Color.GREEN);
 				} 
 				// Setting light board panels
 				else if ((i + j) % 2 == 0 && i > 0 && j > 0 && i < 9 && j < 9) {
-					checker.setBackground(Color.WHITE);
+					checker.setBackground(light);
 				}
 				// Creating dark board panels
 				else if ((i + j) % 2 == 1 && i > 0 && j > 0 && i < 9 && j < 9) {
-					checker.setBackground(Color.GRAY);
+					checker.setBackground(dark);
 				} 
 				// setting row identifiers
 				else if ((i == 0 && j > 0 && j < 9) || (i == 9 && j > 0 && j < 9)) {
 					alphaLabel[row] = new JLabel(alpha[row], JLabel.CENTER);
+					alphaLabel[row].setFont(new Font("Monaco", Font.PLAIN, 20));
 					if (i == 0)
 						checker.add(alphaLabel[row], BorderLayout.SOUTH);
 					else
@@ -87,6 +93,7 @@ public class GamePanel extends JPanel {
 				// setting col identifiers
 				else if ((j == 0 && i > 0 && i < 9) || (j == 9 && i > 0 && i < 9)) {
 					alphaLabel[col] = new JLabel(num[col], JLabel.CENTER);
+					alphaLabel[col].setFont(new Font("Monaco", Font.PLAIN, 20));
 					if (j == 0)
 						checker.add(alphaLabel[col], BorderLayout.EAST);
 					else
