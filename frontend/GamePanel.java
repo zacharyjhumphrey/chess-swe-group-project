@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import common.AvailableMoves;
+import common.Board;
 import common.PositionData;
 
 import java.awt.*;
@@ -23,6 +24,7 @@ public class GamePanel extends JPanel {
 	private JLabel bPawns[] = new JLabel[8];
 	private JLabel wPawns[] = new JLabel[8];
 	private GameControl gc;
+	private JPanel center = new JPanel(new FlowLayout());
 
 	// TODO turn the piece images into static assets
 
@@ -30,24 +32,36 @@ public class GamePanel extends JPanel {
 	public GamePanel(GameControl gc) {
 		this.gc = gc;
 		System.out.println(gc);
-		this.setSize(900,900);
 		// Initializing Panels
 		JPanel display = new JPanel(new BorderLayout());
 		JPanel top = new JPanel(new FlowLayout());
-		JPanel center = new JPanel(new FlowLayout());
 		JPanel bottom = new JPanel(new GridLayout(2,1));
 		JPanel logoutPanel = new JPanel(new FlowLayout());
-		JPanel board = new JPanel(new GridLayout(10, 10));
 
-		//Creating Buttons and panels
+		//Creating Buttons and labels
 		JLabel p1 = new JLabel("Player 1", JLabel.CENTER); // Can get username here
 		JLabel p2 = new JLabel("Player 2", JLabel.CENTER); // Can get username here
-		board.setPreferredSize(new Dimension(750, 750));
-		
 		JButton logout = new JButton("Log Out");
 		logout.addActionListener(gc);
 
+		// Create the logout button.
+		top.add(p1);
+		Board board = new Board();
+		drawBoard(board);
+		bottom.add(p2);
+		logoutPanel.add(logout);
+		bottom.add(logoutPanel);
+		display.add(top, BorderLayout.NORTH);
+		display.add(center, BorderLayout.CENTER);
+		display.add(bottom, BorderLayout.SOUTH);
+
+		this.add(display);
+	}
+	public void drawBoard(Board Board)
+	{
 		// FIXME TEST
+		JPanel board = new JPanel(new GridLayout(10, 10));
+		board.setPreferredSize(new Dimension(750, 750));
 		ArrayList<PositionData> moves = new ArrayList<PositionData>();
 		moves.add(new PositionData(3, 5));
 		gc.setAvailableMoves(new AvailableMoves(moves));
@@ -56,19 +70,19 @@ public class GamePanel extends JPanel {
 			for (int j = 0; j < 10; j++) {				
 				// Initializing loop variables
 				squares[i][j] = new JPanel(new BorderLayout());
-				
+
 				JPanel checker = squares[i][j];
 				if(i>0 && i<9 && j>0 && i<9)
 				{
 					checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
 				}
 				AvailableMoves availableMoves = gc.getAvailableMoves();
-				
+
 				int row = j - 1;
 				int col = i - 1;
 				Color dark = new Color(102, 76, 131);
 				Color light = new Color(179, 160, 200);
-				
+
 				// TODO Make this a little more readable
 				if (availableMoves != null && availableMoves.getMoves().get(0).x == j && availableMoves.getMoves().get(0).y == i) {
 					checker.setBackground(Color.GREEN);
@@ -102,10 +116,11 @@ public class GamePanel extends JPanel {
 				board.add(checker);
 			}
 		}
-		
+
+
 		// Creating variables
-		BufferedImage blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackPawn;
-		BufferedImage whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whitePawn;
+		BufferedImage blackRook, blackKnight, blackBishop, blackQueen, blackKing;
+		BufferedImage whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing;
 		try {
 			// Reading the black piece files
 			blackRook = ImageIO.read(new File("assets/bRook.png"));
@@ -195,22 +210,6 @@ public class GamePanel extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//temp button
-		JButton temp = new JButton("Temp");
-		temp.addActionListener(gc);
-		logoutPanel.add(temp);
-		
-		// Create the logout button.
-		top.add(p1);
 		center.add(board);
-		bottom.add(p2);
-		logoutPanel.add(logout);
-		bottom.add(logoutPanel);
-		display.add(top, BorderLayout.NORTH);
-		display.add(center, BorderLayout.CENTER);
-		display.add(bottom, BorderLayout.SOUTH);
-
-		this.add(display);
 	}
 }

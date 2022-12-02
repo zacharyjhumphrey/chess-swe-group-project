@@ -31,15 +31,19 @@ public class MenuControl implements ActionListener {
 			popUp.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 			popUp.setContentPane(optionPane);
 			popUp.pack();
-
+			
+			
+			//FIXME change to if game found DO THIS
 			//create timer to dispose of dialog after 5 seconds
-			Timer timer = new Timer(5000, new AbstractAction() {
+			Timer timer = new Timer(3000, new AbstractAction() {
 			    @Override
 			    public void actionPerformed(ActionEvent ae) {
+			    	//DO THIS 
 			    	cardLayout.show(container, "5");
 			    	popUp.dispose();
 			    }
 			});
+			//FIXME remove timer
 			timer.start();
 			popUp.setVisible(true);
 		}
