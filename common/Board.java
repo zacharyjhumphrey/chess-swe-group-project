@@ -12,7 +12,7 @@ public class Board {
 	private ArrayList<PieceData> blackPieces;
 
 	public Board() {
-		initializeBoard();
+		this.checkers = initializeBoard();
 	}
 
 	// TODO Doesn't set kings or pieces
@@ -80,31 +80,26 @@ public class Board {
 		return new Board(checkers);
 	}
 
-	// TODO test
 	private static ArrayList<PieceData> getWhitePiecesFrom2DArray(PieceData[][] checkers) {
 		return (ArrayList<PieceData>) Arrays.stream(checkers).flatMap(Arrays::stream)
 				.filter(p -> p.getColor() == PieceColor.w).collect(Collectors.toList());
 	}
 
-	// TODO test
 	private static ArrayList<PieceData> getBlackPiecesFrom2DArray(PieceData[][] checkers) {
 		return (ArrayList<PieceData>) Arrays.stream(checkers).flatMap(Arrays::stream)
 				.filter(p -> p.getColor() == PieceColor.b).collect(Collectors.toList());
 	}
 
-	// TODO test
 	private static King getWhiteKingFrom2DArray(PieceData[][] checkers) {
 		return (King) Arrays.stream(checkers).flatMap(Arrays::stream)
 				.filter(p -> p.getColor() == PieceColor.w && p.getClass() == King.class).collect(Collectors.toList()).get(0);
 	}
 
-	// TODO test
 	private static King getBlackKingFrom2DArray(PieceData[][] checkers) {
 		return (King) Arrays.stream(checkers).flatMap(Arrays::stream)
 				.filter(p -> p.getColor() == PieceColor.b && p.getClass() == King.class).collect(Collectors.toList()).get(0);
 	}
 
-	// TODO Test
 	public PieceData[][] initializeBoard() {
 		PieceData[][] toReturn = new PieceData[8][8];
 
@@ -134,7 +129,7 @@ public class Board {
 		whitePieces.add(new Knight(PieceColor.w, 6, 7));
 		whitePieces.add(new Rook(PieceColor.w, 7, 7));
 		for (int x = 0; x < 8; x++) {
-			whitePieces.add(new Pawn(PieceColor.w, x, 1));
+			whitePieces.add(new Pawn(PieceColor.w, x, 6));
 		}
 
 		for (PieceData piece : blackPieces) {

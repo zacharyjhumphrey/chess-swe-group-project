@@ -1,12 +1,16 @@
 package common;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+
+import javax.imageio.ImageIO;
 
 public abstract class PieceData implements Serializable {
 	private PieceColor color;
 	private String type;
 	protected PositionData position;
-	private int value;
 	public boolean moved = false;
 	private String name;
 	private boolean removed = false;
@@ -15,11 +19,11 @@ public abstract class PieceData implements Serializable {
 	public PieceData(PieceColor color, int x, int y, String name) {
 		this.color = color;
 		this.position = new PositionData(x, y);
-		this.type = type;
+		this.name = name;
 	}
 	
 	public String getFilePath() {
-		return "assets/" + this.color + this.type + ".png";
+		return "assets/" + this.getColorAsString() + this.name + ".png";
 	}
 
 	public void setPosition(int x, int y) {
@@ -41,6 +45,11 @@ public abstract class PieceData implements Serializable {
 	
 	public PieceColor getColor() {
 		return color;
+	}
+	
+	// TODO Change to static
+	public BufferedImage getImage() throws IOException {
+		return ImageIO.read(new File(getFilePath()));
 	}
 
 	@Override
