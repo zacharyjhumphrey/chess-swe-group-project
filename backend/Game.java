@@ -22,11 +22,6 @@ public class Game {
 	private Player blackPlayer;
 	private Player currentPlayer;
 	private boolean gameStarted = false;
-	// private PieceData[][] board = new PieceData[8][8];
-	// private String whiteName;
-	// private String blackName;
-	// private HashMap<List<Integer>, PieceData> pieces = new HashMap<List<Integer>,
-	// PieceData>();
 
 	public Game(Player white, Player black) {
 		this.whitePlayer = white;
@@ -82,9 +77,9 @@ public class Game {
 	}
 
 	public AvailableMoves setCurrentPiece(PositionData pos) {
-		if (this.currentPlayer.getColor() != this.board.getPiece(pos).getColor()) {
-			return null;
-		}
+//		if (this.currentPlayer.getColor() != this.board.getPiece(pos).getColor()) {
+//			return null;
+//		}
 		AvailableMoves moves = this.getAvailableMoves(pos);
 		this.currentAvailableMoves = moves;
 		this.currentPiece = this.board.getPiece(pos);

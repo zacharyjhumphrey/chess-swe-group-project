@@ -131,9 +131,9 @@ public class Server extends AbstractServer {
 
 		// user clicks on a checker on the board
 		if (arg0 instanceof PositionData) {
-			PositionData pos = (PositionData) arg0;
-			System.out.println("position data has been recieved: " + pos.x + ", " + pos.y);
 			PositionData position = (PositionData) arg0;
+			System.out.println("position data has been recieved: " + position.x + ", " + position.y);
+
 			AvailableMoves moves = this.currentGame.getCurrentAvailableMoves();
 
 			// only accept valid positions
@@ -177,14 +177,6 @@ public class Server extends AbstractServer {
 		}
 
 	}
-
-	// Before this todo is implemented, we need to consider the use case of
-	// selecting a new piece to move
-	// TODO check that the position is valid. send error to user if is not.
-	// (inbounds, position is not occupied by friendly piece)
-	// if so
-	// remove the opposing piece
-	// update the board for both players
 
 	private void userClickedPosition(ConnectionToClient conn, PositionData clickedPosition) {
 		AvailableMoves movesForCurrentPiece = this.currentGame.getCurrentAvailableMoves();
@@ -237,6 +229,6 @@ public class Server extends AbstractServer {
 	}
 
 	protected void clientConnected(ConnectionToClient client) {
-		System.out.println("Client Connected");
+		System.out.println("Client Connected: " + client.getId());
 	}
 }

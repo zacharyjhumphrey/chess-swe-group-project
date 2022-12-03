@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import common.*;
 
 public class GamePanel extends JPanel {
 
@@ -28,6 +29,9 @@ public class GamePanel extends JPanel {
 	private JLabel wPawns[] = new JLabel[8];
 	private GameControl gc;
 	private JPanel center = new JPanel(new FlowLayout());
+	private AvailableMoves currentAvailableMoves;
+	private Color dark = new Color(102, 76, 131);
+	private Color light = new Color(179, 160, 200);
 
 	// TODO turn the piece images into static assets
 
@@ -49,7 +53,6 @@ public class GamePanel extends JPanel {
 
 		// Create the logout button.
 		top.add(p1);
-		Board board = new Board();
 		drawBoard(new Board());
 		bottom.add(p2);
 		logoutPanel.add(logout);
@@ -58,17 +61,12 @@ public class GamePanel extends JPanel {
 		display.add(center, BorderLayout.CENTER);
 		display.add(bottom, BorderLayout.SOUTH);
 
-		// FIXME remove test available moves
-		ArrayList<PositionData> moves = new ArrayList<PositionData>();
-		moves.add(new PositionData(3, 5));
-		moves.add(new PositionData(4, 5));
-		gc.setAvailableMoves(new AvailableMoves(moves));
-		this.drawAvailableMoves(new AvailableMoves(moves));
-		
 		this.add(display);
 	}
 
 	public void drawBoard(Board board) {
+//		center.removeAll();
+		
 		JPanel boardGrid = new JPanel(new GridLayout(10, 10));
 		boardGrid.setPreferredSize(new Dimension(750, 750));
 
@@ -79,15 +77,11 @@ public class GamePanel extends JPanel {
 
 				JPanel checker = squares[i][j];
 				if (i > 0 && i < 9 && j > 0 && i < 9) {
-					checker.addMouseListener(new CheckerMouseListener(this.gc, j, i));
+					checker.addMouseListener(new CheckerMouseListener(this.gc, j - 1, i - 1));
 				}
-				AvailableMoves availableMoves = gc.getAvailableMoves();
 
 				int row = j - 1;
 				int col = i - 1;
-				Color dark = new Color(102, 76, 131);
-				Color light = new Color(179, 160, 200);
-
 
 				// Setting light board panels
 				if ((i + j) % 2 == 0 && i > 0 && j > 0 && i < 9 && j < 9) {
@@ -139,10 +133,53 @@ public class GamePanel extends JPanel {
 		center.add(boardGrid);
 	}
 	
+	public void updateBoard(Board board) {
+		System.out.println("updating board");
+		clearAvailableMoves(this.currentAvailableMoves);
+		
+		// 4, 4
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+				PieceData piece = board.getPiece(x, y);
+				
+				if (piece == null) {
+					continue;
+				}
+				
+				PositionData pos = piece.getPosition();
+
+				this.squares[pos.y + 1][pos.x + 1].removeAll(); 
+				this.squares[pos.y + 1][pos.x + 1].setBackground(Color.RED);
+
+				try {
+					// TODO This file is not working!!!
+					squares[y + 1][x + 1].add(new JLabel(new ImageIcon(piece.getImage())), BorderLayout.CENTER);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void setAvailableMoves(AvailableMoves moves) {
+		this.clearAvailableMoves(this.currentAvailableMoves);
+		this.currentAvailableMoves = moves;
+		this.drawAvailableMoves(moves);
+	}
+
+	public void clearAvailableMoves(AvailableMoves moves) {
+		if (moves == null) {
+			return;
+		}
+		for (PositionData pos : moves.getMoves()) {
+			this.squares[pos.y + 1][pos.x + 1].setBackground(((pos.x + pos.y) % 2 == 0) ? light : dark);
+		}
+	}
+
 	public void drawAvailableMoves(AvailableMoves moves) {
 		for (PositionData pos : moves.getMoves()) {
-			this.squares[pos.x+1][pos.y+1].setBackground(Color.GREEN);
+			this.squares[pos.y + 1][pos.x + 1].setBackground(Color.GREEN);
 		}
-		
 	}
 }

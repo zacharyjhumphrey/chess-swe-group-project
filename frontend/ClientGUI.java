@@ -2,8 +2,12 @@ package frontend;
 
 import javax.swing.*;
 
+import common.AvailableMoves;
+import common.PositionData;
+
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ClientGUI extends JFrame {
 
@@ -35,6 +39,7 @@ public class ClientGUI extends JFrame {
 
 		client.setLoginControl(lc);
 		client.setCreateAccountControl(ca);
+		client.setGameControl(gc);
 		
 		// Create the four views. (need the controller to register with the Panels
 		JPanel view1 = new InitialPanel(ic);
@@ -49,10 +54,11 @@ public class ClientGUI extends JFrame {
 		container.add(view4, "3");
 		container.add(view5, "4");
 		container.add(view6, "5");
-
+		
 		// Show the initial view in the card layout.
 		cardLayout.show(container, "5");
-
+//		gc.updateBoard(null);
+		
 		// Add the card layout container to the JFrame.
 		this.add(container, BorderLayout.CENTER);
 		

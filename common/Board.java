@@ -1,10 +1,11 @@
 package common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class Board {
+public class Board implements Serializable {
 	private PieceData[][] checkers;
 	private King whiteKing;
 	private King blackKing;

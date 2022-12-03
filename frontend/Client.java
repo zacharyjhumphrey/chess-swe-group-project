@@ -3,6 +3,8 @@ package frontend;
 import ocsf.client.AbstractClient;
 import common.AvailableMoves;
 import common.CommunicationError;
+import common.PositionData;
+import common.*;
 
 public class Client extends AbstractClient {
 	// Private data fields for storing the GUI controllers.
@@ -31,7 +33,6 @@ public class Client extends AbstractClient {
 	// Method that handles messages from the server.
 	public void handleMessageFromServer(Object arg0) {
 		System.out.println("recieved msg from server");
-		
 		// If we received a String, figure out what this event is.
 		if (arg0 instanceof String) {
 			// Get the text of the message.
@@ -65,10 +66,20 @@ public class Client extends AbstractClient {
 		}
 		
 		if (arg0 instanceof AvailableMoves) {
-			AvailableMoves moves = (AvailableMoves) arg0;
+			AvailableMoves temp = (AvailableMoves) arg0;
+			AvailableMoves moves = new AvailableMoves(temp.x);
+			System.out.println(moves.x);
 			System.out.println("recieved moves from server");
-			System.out.println(moves.getMoves().get(0));
+			for (PositionData pos : moves.getMoves()) {
+				System.out.println(pos);
+			}
 			gameControl.setAvailableMoves(moves);
+		}
+		
+		if (arg0 instanceof Board) {
+			System.out.println("board recieved");
+			Board board = (Board) arg0;
+			gameControl.updateBoard(board);
 		}
 	}
 
