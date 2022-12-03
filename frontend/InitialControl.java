@@ -32,7 +32,7 @@ public class InitialControl implements ActionListener {
 			CreateAccountPanel createAccountPanel = (CreateAccountPanel) container.getComponent(2);
 			createAccountPanel.setError("");
 			CardLayout cardLayout = (CardLayout) container.getLayout();
-			cardLayout.show(container, "4");
+			cardLayout.show(container, "3");
 		}
 	}
 }

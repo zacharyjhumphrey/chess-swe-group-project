@@ -68,6 +68,11 @@ public class CreateAccountControl implements ActionListener {
 	public void createAccountSuccess() {
 		CardLayout cardLayout = (CardLayout) container.getLayout();
 		cardLayout.show(container, "2");
+		CreateAccountPanel createAccountPanel = (CreateAccountPanel) container.getComponent(2);
+		
+		createAccountPanel.setUsername("");
+		createAccountPanel.setPassword("");
+		createAccountPanel.setVerifyPassword("");
 	}
 
 	// Method that displays a message in the error - could be invoked by ChatClient

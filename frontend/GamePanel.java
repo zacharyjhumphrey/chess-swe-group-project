@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import common.AvailableMoves;
+import common.Board;
 import common.PositionData;
 
 import java.awt.*;
@@ -14,61 +15,90 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
 
-	JPanel squares[][] = new JPanel[10][10];
-	JLabel alphaLabel[] = new JLabel[8];
-	String alpha[] = { "A", "B", "C", "D", "E", "F", "G", "H" };
-	String num[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
-	BufferedImage bPawnImages[] = new BufferedImage[8];
-	BufferedImage wPawnImages[] = new BufferedImage[8];
-	JLabel bPawns[] = new JLabel[8];
-	JLabel wPawns[] = new JLabel[8];
+	private JPanel squares[][] = new JPanel[10][10];
+	private JLabel alphaLabel[] = new JLabel[8];
+	private String alpha[] = { "A", "B", "C", "D", "E", "F", "G", "H" };
+	private String num[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
+	private BufferedImage bPawnImages[] = new BufferedImage[8];
+	private BufferedImage wPawnImages[] = new BufferedImage[8];
+	private JLabel bPawns[] = new JLabel[8];
+	private JLabel wPawns[] = new JLabel[8];
 	private GameControl gc;
-	
+	private JPanel center = new JPanel(new FlowLayout());
+
 	// TODO turn the piece images into static assets
-	
-	// Constructor for the initial panel.
+
+	// Constructor for the game panel.
 	public GamePanel(GameControl gc) {
 		this.gc = gc;
 		System.out.println(gc);
-		
-		// Initializing variables
+		// Initializing Panels
 		JPanel display = new JPanel(new BorderLayout());
+		JPanel top = new JPanel(new FlowLayout());
+		JPanel bottom = new JPanel(new GridLayout(2,1));
+		JPanel logoutPanel = new JPanel(new FlowLayout());
+
+		//Creating Buttons and labels
 		JLabel p1 = new JLabel("Player 1", JLabel.CENTER); // Can get username here
 		JLabel p2 = new JLabel("Player 2", JLabel.CENTER); // Can get username here
+		JButton logout = new JButton("Log Out");
+		logout.addActionListener(gc);
+
+		// Create the logout button.
+		top.add(p1);
+		Board board = new Board();
+		drawBoard(board);
+		bottom.add(p2);
+		logoutPanel.add(logout);
+		bottom.add(logoutPanel);
+		display.add(top, BorderLayout.NORTH);
+		display.add(center, BorderLayout.CENTER);
+		display.add(bottom, BorderLayout.SOUTH);
+
+		this.add(display);
+	}
+	public void drawBoard(Board Board)
+	{
+		// FIXME TEST
 		JPanel board = new JPanel(new GridLayout(10, 10));
 		board.setPreferredSize(new Dimension(750, 750));
-
-		// FIXME TEST
 		ArrayList<PositionData> moves = new ArrayList<PositionData>();
 		moves.add(new PositionData(3, 5));
 		gc.setAvailableMoves(new AvailableMoves(moves));
-		
+
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {				
-				// Initializing loop varibales
+				// Initializing loop variables
 				squares[i][j] = new JPanel(new BorderLayout());
+
 				JPanel checker = squares[i][j];
-				checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
-				
+				if(i>0 && i<9 && j>0 && i<9)
+				{
+					checker.addMouseListener(new CheckerMouseListener(this.gc, i, j));
+				}
 				AvailableMoves availableMoves = gc.getAvailableMoves();
-				
+
 				int row = j - 1;
 				int col = i - 1;
+				Color dark = new Color(102, 76, 131);
+				Color light = new Color(179, 160, 200);
+
 				// TODO Make this a little more readable
 				if (availableMoves != null && availableMoves.getMoves().get(0).x == j && availableMoves.getMoves().get(0).y == i) {
 					checker.setBackground(Color.GREEN);
 				} 
 				// Setting light board panels
 				else if ((i + j) % 2 == 0 && i > 0 && j > 0 && i < 9 && j < 9) {
-					checker.setBackground(Color.WHITE);
+					checker.setBackground(light);
 				}
 				// Creating dark board panels
 				else if ((i + j) % 2 == 1 && i > 0 && j > 0 && i < 9 && j < 9) {
-					checker.setBackground(Color.GRAY);
+					checker.setBackground(dark);
 				} 
 				// setting row identifiers
 				else if ((i == 0 && j > 0 && j < 9) || (i == 9 && j > 0 && j < 9)) {
 					alphaLabel[row] = new JLabel(alpha[row], JLabel.CENTER);
+					alphaLabel[row].setFont(new Font("Monaco", Font.PLAIN, 20));
 					if (i == 0)
 						checker.add(alphaLabel[row], BorderLayout.SOUTH);
 					else
@@ -77,6 +107,7 @@ public class GamePanel extends JPanel {
 				// setting col identifiers
 				else if ((j == 0 && i > 0 && i < 9) || (j == 9 && i > 0 && i < 9)) {
 					alphaLabel[col] = new JLabel(num[col], JLabel.CENTER);
+					alphaLabel[col].setFont(new Font("Monaco", Font.PLAIN, 20));
 					if (j == 0)
 						checker.add(alphaLabel[col], BorderLayout.EAST);
 					else
@@ -85,10 +116,11 @@ public class GamePanel extends JPanel {
 				board.add(checker);
 			}
 		}
-		// Creating variables
 
-		BufferedImage blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackPawn;
-		BufferedImage whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whitePawn;
+
+		// Creating variables
+		BufferedImage blackRook, blackKnight, blackBishop, blackQueen, blackKing;
+		BufferedImage whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing;
 		try {
 			// Reading the black piece files
 			blackRook = ImageIO.read(new File("assets/bRook.png"));
@@ -178,10 +210,6 @@ public class GamePanel extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		display.add(p1, BorderLayout.NORTH);
-		display.add(board, BorderLayout.CENTER);
-		display.add(p2, BorderLayout.SOUTH);
-		this.add(display);
+		center.add(board);
 	}
 }

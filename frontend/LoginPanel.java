@@ -22,13 +22,22 @@ public class LoginPanel extends JPanel
 	{
 		return new String(passwordField.getPassword());
 	}
-  
+	//setter for username text field
+	public void setUsername(String username)
+	{
+		usernameField.setText(username);;
+	}
+	//setter for password text field
+	public void setPassword(String password)
+	{
+		passwordField.setText(password);
+	}
 	// Setter for the error text.
 	public void setError(String error)
 	{
 		errorLabel.setText(error);
 	}
-  
+	
 	// Constructor for the login panel.
 	public LoginPanel(LoginControl loginControl)
 	{
