@@ -142,13 +142,6 @@ public class Server extends AbstractServer {
 				System.out.println(currentGame.toString());
 				System.out.println("white: " + currentGame.getWhitePlayer().getUsername());
 				System.out.println("black: " + currentGame.getBlackPlayer().getUsername());
-			} else {
-				System.out.println(playerRequestingStart.getUsername() + " is waiting");
-				try {
-					arg1.sendToClient(currentGame.waitUser());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 
