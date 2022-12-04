@@ -78,16 +78,21 @@ public class MenuPanel extends JPanel
 		//get player username
 		String username = "Username";
 		//get record size here
-		int recordSize = 40;
+		int recordSize = 0;
 		//get player wins
 		int getWins=10;
 		//get player losses
 		int getlosses=10;
 		//get player ties
 		int getTies=10;
-		for (int i=0; i<recordSize; i++)
+		if (recordSize==0)
+			textArea.append("No Records Found");
+		else
 		{
-			textArea.append(username +":	Wins:"+getWins+"	Losses:"+getlosses+"	Ties:"+getTies+"\n");
+			for (int i=0; i<recordSize; i++)
+			{
+				textArea.append(username +":	Wins:"+getWins+"	Losses:"+getlosses+"	Ties:"+getTies+"\n");
+			}
 		}
 	}
 }
