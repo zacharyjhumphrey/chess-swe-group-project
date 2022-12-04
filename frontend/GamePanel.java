@@ -142,21 +142,17 @@ public class GamePanel extends JPanel {
 			for (int y = 0; y < 8; y++) {
 				PieceData piece = board.getPiece(x, y);
 				
+				this.squares[y + 1][x + 1].invalidate();
+				this.squares[y + 1][x + 1].removeAll();
+				this.squares[y + 1][x + 1].repaint();
+				this.squares[y + 1][x + 1].revalidate();
+
 				if (piece == null) {
-					//this.squares[x + 1][y + 1].removeAll();
-					//this.squares[x][y].setBackground(Color.RED);
 					continue;
 				}
-
-				PositionData pos = piece.getPosition();
 				
-				//this.squares[pos.y + 1][pos.x + 1].revalidate();
-				this.squares[pos.y + 1][pos.x + 1].removeAll();
-				this.squares[pos.y + 1][pos.x + 1].revalidate();
 				//testing for pieces
-				this.squares[pos.y + 1][pos.x + 1].setBackground(Color.RED);
 				try {
-					// TODO This file is not working!!!
 					squares[y + 1][x + 1].add(new JLabel(new ImageIcon(piece.getImage())), BorderLayout.CENTER);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

@@ -46,6 +46,11 @@ public abstract class PieceData implements Serializable {
 	public PieceColor getColor() {
 		return color;
 	}
+
+	public void move(PositionData toPos) {
+		this.moved = true;
+		this.setPosition(toPos.x, toPos.y);
+	}
 	
 	// TODO Change to static
 	public BufferedImage getImage() throws IOException {

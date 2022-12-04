@@ -13,8 +13,10 @@ public class Pawn extends PieceData {
 		ArrayList<PositionData> toReturn = new ArrayList<>();
 		int x = this.position.x;
 
+		int moveLength = (this.moved) ? 1 : 2;
+		
 		// Get positions above piece
-		for (int y = this.position.y - 1; y > 0 && y >= this.position.y - 2; y--) {
+		for (int y = this.position.y - 1; y > 0 && y >= this.position.y - moveLength; y--) {
 			PositionData pos = new PositionData(x, y);
 			PieceData currentPiece = board.getPiece(pos);
 
