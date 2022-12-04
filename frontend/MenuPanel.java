@@ -8,37 +8,86 @@ public class MenuPanel extends JPanel
 	// Constructor for the menu panel.
 	public MenuPanel(MenuControl menuControl)
 	{    
-		// Create the information label.
+		// Create the labels.
 		JLabel label = new JLabel("Main Menu", JLabel.CENTER);
-		JLabel game = new JLabel("Join Random Game", JLabel.CENTER);
+		JLabel join = new JLabel("Join Random Game", JLabel.CENTER);
+		JLabel playerRecordsLabel = new JLabel("Player Records", JLabel.CENTER);
+
+		// Creating all panels for menu panel.
+		JPanel grid = new JPanel(new BorderLayout());
+		JPanel center = new JPanel(new GridLayout(2,1));
+		JPanel centerTop = new JPanel(new BorderLayout());
+		JPanel centerBottom = new JPanel(new BorderLayout());
+		JPanel centerBottomPadding = new JPanel(new BorderLayout());
+		JPanel joinPanel = new JPanel(new BorderLayout());
+		JPanel bottom = new JPanel(new FlowLayout());
+		JPanel menupanel = new JPanel(new GridLayout(4,2));
+
+
+		//ScrollPane Panel
+		JTextArea playerRecords = new JTextArea();
+		JScrollPane playerRecordsSP = new JScrollPane(playerRecords);
+		playerRecords.setLineWrap(false);
 		
+		//setting text for text area
+		this.setPlayerRecords(playerRecords);
+
 		// Create the random button.
 		JButton randomBtn = new JButton("Join");
 		randomBtn.addActionListener(menuControl);
 		JPanel randomButtonBuffer = new JPanel();
 		randomButtonBuffer.add(randomBtn);
-
+		
 		// Create the logout button.
 		JButton logout = new JButton("Log Out");
 		logout.addActionListener(menuControl);
-		
-		// Arrange the panels in a for layout.
-		JPanel grid = new JPanel(new BorderLayout());
-		JPanel center = new JPanel(new FlowLayout());
-		JPanel menupanel = new JPanel(new GridLayout(4,2));
-		
+
 		//setting sizes
-		menupanel.setPreferredSize(new Dimension(150, 400));
-		center.setPreferredSize(new Dimension(150, 400));
-		
+		menupanel.setPreferredSize(new Dimension(450, 60));
+		center.setPreferredSize(new Dimension(200, 730));
+		centerBottomPadding.setPreferredSize(new Dimension(300, 100));
+
+		//adding to center top 
+		centerTop.add(playerRecordsLabel,BorderLayout.NORTH);
+		centerTop.add(playerRecordsSP,BorderLayout.CENTER);
+		//adding to joinPanel south bottom
+		joinPanel.add(join,BorderLayout.NORTH);
+		joinPanel.add(randomButtonBuffer,BorderLayout.CENTER);
+		//adding padding to center north bottom
+		centerBottom.add(centerBottomPadding,BorderLayout.NORTH);
+		centerBottom.add(joinPanel,BorderLayout.CENTER);
+		//adding top and bottom to center
+		center.add(centerTop);
+		center.add(centerBottom);
 		//adding components
 		menupanel.add(label);
-		center.add(game);
-		center.add(randomButtonBuffer);
+		//adding logout to bottom
+		bottom.add(logout);
+		
+		//adding panels
 		grid.add(menupanel,BorderLayout.NORTH);
 		grid.add(center, BorderLayout.CENTER);
-		grid.add(logout, BorderLayout.SOUTH);
-		
+		grid.add(bottom, BorderLayout.SOUTH);
+
 		this.add(grid);
+	}
+	//Setting text for text area
+	public void setPlayerRecords(JTextArea  textArea)
+	{
+		this.repaint();
+		//get player username
+		String username = "Username";
+		//get record size here
+		int recordSize = 40;
+		//get player wins
+		int getWins=10;
+		//get player losses
+		int getlosses=10;
+		//get player ties
+		int getTies=10;
+		for (int i=0; i<recordSize; i++)
+		{
+			textArea.append(username +":	Wins:"+getWins+"	Losses:"+getlosses+"	Ties:"+getTies+"\n");
+		}
 	}
 }
