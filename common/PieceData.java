@@ -65,6 +65,10 @@ public abstract class PieceData implements Serializable {
 	public AvailableMoves getAvailableMoves(Board b) {
 		return null;
 	}
+	
+	public boolean isRemoved() {
+		return this.removed;
+	}
 
 	public boolean onSameTeam(PieceData piece) {
 		if (piece == null) {

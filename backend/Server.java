@@ -1,8 +1,6 @@
 package backend;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
@@ -11,6 +9,8 @@ import java.util.*;
 import common.AvailableMoves;
 import common.CommunicationError;
 import common.CreateAccountData;
+import common.GameLostData;
+import common.GameWonData;
 import common.LoginData;
 import common.PieceData;
 import common.Player;
@@ -24,16 +24,23 @@ public class Server extends AbstractServer {
 	private PieceData currentPiece;
 	private Game currentGame;
 	private HashMap<Integer, Game> games = new HashMap<Integer, Game>();
+	private HashMap<Long, Player> players = new HashMap<Long, Player>();
+	private int gameCounter = 0;
 
 	public Server() {
 		super(8300);
-		currentGame = new Game(null, null);
 		database = new Database();
 	}
 
 	public Server(int port) {
 		super(port);
 		database = new Database();
+	}
+
+	public void createGame(Player p1, Player p2) {
+		currentGame = new Game(p1, p2);
+		games.put(gameCounter, currentGame);
+		gameCounter++;
 	}
 
 	public static void main(String[] args) {
@@ -88,8 +95,13 @@ public class Server extends AbstractServer {
 			// Checks if username and password exist in database;
 			if (database.credentialsValid(loginData)) {
 				try {
-					Player user = new Player(loginData.getUsername(), loginData.getPassword());
+					Player player = new Player(loginData.getUsername(), loginData.getPassword());
+//					player.setConnectionToClient(arg1);
+//					players.put(arg1.getId(), player);
+
 					arg1.sendToClient("LoginSuccessful");
+					
+					System.out.println("Client Logged In : " + player.getUsername() + ", " + arg1.getId());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -131,64 +143,21 @@ public class Server extends AbstractServer {
 
 		// user clicks on a checker on the board
 		if (arg0 instanceof PositionData) {
-			PositionData position = (PositionData) arg0;
-			System.out.println("position data has been recieved: " + position.x + ", " + position.y);
-
-			AvailableMoves moves = this.currentGame.getCurrentAvailableMoves();
-
-			// only accept valid positions
-			if (!position.inbounds()) {
-				try {
-					// TODO send board to both clients in users' game
-					arg1.sendToClient(null);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-			// if the user clicks on an availableMove checker
-			if (moves != null && moves.containsPosition(position)) {
-				// move the current piece
-				this.currentGame.moveCurrentPieceToPosition(position);
-				try {
-					// TODO send board to both clients in users' game
-					arg1.sendToClient(this.currentGame.getBoard());
-					// TODO if win, send win/loss to both clients
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				return;
-			}
-
-			// if the user clicks on an empty space or a new piece
-			moves = this.currentGame.setCurrentPiece(position);
-
-			try {
-				arg1.sendToClient(moves);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("failed to send available moves to client");
-				e.printStackTrace();
-			}
-
+			handlePositionDataFromClient((PositionData) arg0, arg1);
 		}
 
 	}
 
-	private void userClickedPosition(ConnectionToClient conn, PositionData clickedPosition) {
-		AvailableMoves movesForCurrentPiece = this.currentGame.getCurrentAvailableMoves();
-		Player currentPlayer = this.currentGame.getCurrentPlayer();
-//		Player clientPlayer = this.playersMap.get(conn.id);
-//		if (clientPlayer != currentPlayer) {
-//			conn.sendtoClient(new Error("wait your turn"));
-//		}
+	public void handlePositionDataFromClient(PositionData position, ConnectionToClient conn) {
+		System.out.println("position data has been recieved: " + position.x + ", " + position.y);
 
-		if (movesForCurrentPiece == null || !movesForCurrentPiece.containsPosition(clickedPosition)) {
+		AvailableMoves moves = this.currentGame.getCurrentAvailableMoves();
+		Player clientPlayer = players.get(conn.getId());
+
+		// only accept valid positions
+		if (!position.inbounds() || clientPlayer != this.currentGame.getCurrentPlayer()) {
 			try {
-				conn.sendToClient(this.currentGame.setCurrentPiece(clickedPosition));
+				conn.sendToClient(null);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -196,11 +165,73 @@ public class Server extends AbstractServer {
 			return;
 		}
 
-		this.currentGame.moveCurrentPieceToPosition(clickedPosition);
+		// if the user clicks on an availableMove checker
+		if (moves != null && moves.containsPosition(position)) {
+			// move the current piece
+			this.currentGame.moveCurrentPieceToPosition(position);
+			try {
+				ConnectionToClient blackConnection = this.currentGame.getBlackPlayer().getConnectionToClient();
+				ConnectionToClient whiteConnection = this.currentGame.getWhitePlayer().getConnectionToClient();
+
+				blackConnection.sendToClient(this.currentGame.getBoard());
+				whiteConnection.sendToClient(this.currentGame.getBoard());
+
+				// TODO if win, send win/loss to both clients
+				if (this.currentGame.isGameOver()) {
+					System.out.println("game over");
+					Player whitePlayer = this.currentGame.getWhitePlayer();
+					Player blackPlayer = this.currentGame.getBlackPlayer();
+					
+					ConnectionToClient winnerConnection, loserConnection;
+					
+					if (this.currentGame.getWinner() == whitePlayer) {
+						winnerConnection = whiteConnection;
+						loserConnection = blackConnection;
+						database.updatePlayerStats("win", whitePlayer.getUsername());
+						database.updatePlayerStats("loss", blackPlayer.getUsername());
+					} else {
+						winnerConnection = blackConnection;
+						loserConnection = whiteConnection;
+						database.updatePlayerStats("win", blackPlayer.getUsername());
+						database.updatePlayerStats("loss", whitePlayer.getUsername());
+					}
+					
+					winnerConnection.sendToClient(new GameWonData());
+					loserConnection.sendToClient(new GameLostData());
+					
+					
+					
+					// TODO update win/loss in db
+				}
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return;
+		}
+
+		// if the user clicks on a piece they do not own
+		if (this.currentGame.playerDoesNotOwnPiece(position)) {
+			try {
+				conn.sendToClient(null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return;
+		}
+
+		// if the user clicks on an empty space or a new piece
+		moves = this.currentGame.setCurrentPiece(position);
+
 		try {
-			conn.sendToClient(this.currentGame.getBoard());
+			conn.sendToClient(moves);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.out.println("failed to send available moves to client");
 			e.printStackTrace();
 		}
 	}
@@ -228,7 +259,15 @@ public class Server extends AbstractServer {
 		System.out.println("server closed");
 	}
 
-	protected void clientConnected(ConnectionToClient client) {
-		System.out.println("Client Connected: " + client.getId());
+	protected void clientConnected(ConnectionToClient clientConn) {
+		System.out.println("Client Connected: " + clientConn.getId());
+		Player p = (players.size() == 1) ? new Player("player1", "pw") : new Player("player2", "pw");
+		p.setConnectionToClient(clientConn);
+		players.put(clientConn.getId(), p);
+
+		if (players.keySet().size() >= 2) {
+			Iterator<Player> playersList = players.values().iterator();
+			createGame(playersList.next(), playersList.next());
+		}
 	}
 }

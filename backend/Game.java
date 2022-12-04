@@ -6,12 +6,14 @@ import java.util.List;
 
 import common.AvailableMoves;
 import common.Board;
+import common.GameLostData;
+import common.GameTieData;
+import common.GameWonData;
 import common.King;
 import common.PieceColor;
 import common.PieceData;
 import common.Player;
 import common.PositionData;
-import backend.GameWonData;
 
 public class Game {
 	private Board board = new Board();
@@ -21,7 +23,9 @@ public class Game {
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private Player currentPlayer;
+	private Player winner;
 	private boolean gameStarted = false;
+	private boolean gameOver = false;
 
 	public Game(Player white, Player black) {
 		this.whitePlayer = white;
@@ -69,7 +73,6 @@ public class Game {
 		this.currentAvailableMoves = null;
 		this.currentPiece = null;
 		movePiece(fromPos, toPos);
-		this.currentPlayer = (this.isWhiteCurrentPlayer()) ? this.blackPlayer : this.whitePlayer;
 	}
 
 	public void updateBoard(Board newBoard) {
@@ -88,6 +91,13 @@ public class Game {
 
 	public void moveCurrentPieceToPosition(PositionData toPos) {
 		this.board.movePiece(this.currentPiece.getPosition(), toPos);
+		this.currentAvailableMoves = null;
+		this.currentPlayer = (this.isWhiteCurrentPlayer()) ? this.blackPlayer : this.whitePlayer;
+		this.gameOver = (this.board.getBlackKing().isRemoved() || this.board.getWhiteKing().isRemoved());
+		System.out.println("game status is : " + this.isGameOver());
+		if (this.isGameOver()) {
+			this.winner = (this.board.getBlackKing().isRemoved()) ? this.whitePlayer : this.blackPlayer;
+		}
 	}
 
 	public AvailableMoves getAvailableMoves(PositionData pos) {
@@ -107,6 +117,10 @@ public class Game {
 
 	public HashMap<List<Integer>, PieceData> getPieces() {
 		return pieces;
+	}
+	
+	public boolean isGameOver() {
+		return this.gameOver;
 	}
 
 	public GameWonData winGame() {
@@ -156,6 +170,22 @@ public class Game {
 		}
 
 		return r;
+	}
+
+	public boolean playerDoesNotOwnPiece(PositionData pos) {
+		PieceData piece = this.board.getPiece(pos);
+		
+		if (piece == null) {
+			return false;
+		}
+		
+		Player playerThatOwnsPiece = (piece.getColor() == PieceColor.w) ? this.whitePlayer : this.blackPlayer; 
+		
+		return this.currentPlayer != playerThatOwnsPiece;
+	}
+
+	public Player getWinner() {
+		return this.winner;
 	}
 
 }

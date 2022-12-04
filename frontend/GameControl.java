@@ -55,14 +55,6 @@ public class GameControl implements ActionListener {
 			}
 		}
 
-		// Setting game
-		if (status.equals("win")) {
-			gameText = "You Win";
-		} else if (status.equals("tie")) {
-			gameText = "You Tied";
-		} else if (status.equals("loss")) {
-			gameText = "You Loss";
-		}
 		// TEMP button to check game ending popup
 		if (command.equals("Temp")) {
 
@@ -74,6 +66,19 @@ public class GameControl implements ActionListener {
 				cardLayout.show(container, "4");
 			}
 		}
+	}
+	
+	public void showDialog(String msg) {
+		int optionType = JOptionPane.DEFAULT_OPTION;
+		CardLayout cardLayout = (CardLayout) container.getLayout();
+
+		// Game end pop up
+		int option = JOptionPane.showConfirmDialog(container, msg, "Game Ended", optionType);
+		// if button pressed return to main menu
+		if (option == 0) {
+			cardLayout.show(container, "4");
+		}
+
 	}
 
 	public void sendCheckerClickedToServer(PositionData p) {

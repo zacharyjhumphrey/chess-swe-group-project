@@ -7,41 +7,41 @@ public class Pawn extends PieceData {
 		super(color, x, y, "Pawn");
 	}
 
-	// TODO this only works for white pieces
+	// TODO should create and use flip board function
 	@Override
 	public AvailableMoves getAvailableMoves(Board board) {		
 		ArrayList<PositionData> toReturn = new ArrayList<>();
 		int x = this.position.x;
 
 		int moveLength = (this.moved) ? 1 : 2;
+		int direction = (this.getColor() == PieceColor.w) ? -1 : 1; 
 		
 		// Get positions above piece
-		for (int y = this.position.y - 1; y > 0 && y >= this.position.y - moveLength; y--) {
+		for (int y = this.position.y + direction; y >= 0 && y < 8 && y >= this.position.y - moveLength && y <= this.position.y + moveLength; y += direction) {
 			PositionData pos = new PositionData(x, y);
 			PieceData currentPiece = board.getPiece(pos);
 
-			if (currentPiece == null) {
-				toReturn.add(pos);
-				continue;
+			if (currentPiece != null) {
+				break;
 			}
-
-			if (!this.onSameTeam(currentPiece)) {
-				toReturn.add(pos);
-			}
-
-			break;
+			
+			toReturn.add(pos);
 		}
 
-		PositionData upperLeftPos = new PositionData(x - 1, this.position.y - 1);
-		PieceData upperLeftPiece = board.getPiece(upperLeftPos);
-		if (upperLeftPiece != null && isValidPosition(upperLeftPos) && !onSameTeam(upperLeftPiece)) {
-			toReturn.add(upperLeftPos);
+		PositionData upperLeftPos = new PositionData(x - 1, this.position.y + direction);
+		if (upperLeftPos.inbounds()) {
+			PieceData upperLeftPiece = board.getPiece(upperLeftPos);
+			if (upperLeftPiece != null && isValidPosition(upperLeftPos) && !onSameTeam(upperLeftPiece)) {
+				toReturn.add(upperLeftPos);
+			}
 		}
 
-		PositionData upperRightPos = new PositionData(x + 1, this.position.y - 1);
-		PieceData upperRightPiece = board.getPiece(upperRightPos);
-		if (upperRightPiece != null && isValidPosition(upperRightPos) && !onSameTeam(upperRightPiece)) {
-			toReturn.add(upperRightPos);
+		PositionData upperRightPos = new PositionData(x + 1, this.position.y + direction);
+		if (upperRightPos.inbounds()) {
+			PieceData upperRightPiece = board.getPiece(upperRightPos);
+			if (upperRightPiece != null && isValidPosition(upperRightPos) && !onSameTeam(upperRightPiece)) {
+				toReturn.add(upperRightPos);
+			}
 		}
 
 		return new AvailableMoves(toReturn);

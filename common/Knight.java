@@ -25,7 +25,13 @@ public class Knight extends PieceData {
 						new PositionData(x - 1, y - 2) }));
 
 		for (PositionData pos : positions) {
-			if (isValidPosition(pos)) {
+			if (!pos.inbounds()) {
+				continue;
+			}
+
+			PieceData piece = board.getPiece(pos);
+			
+			if (piece == null || !this.onSameTeam(piece)) {
 				toReturn.add(pos);
 			}
 		}

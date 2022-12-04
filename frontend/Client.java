@@ -1,9 +1,7 @@
 package frontend;
 
 import ocsf.client.AbstractClient;
-import common.AvailableMoves;
-import common.CommunicationError;
-import common.PositionData;
+import common.*;
 import common.*;
 
 public class Client extends AbstractClient {
@@ -80,6 +78,18 @@ public class Client extends AbstractClient {
 			System.out.println("board recieved");
 			Board board = (Board) arg0;
 			gameControl.updateBoard(board);
+		}
+		
+		if (arg0 instanceof GameWonData) {
+			this.gameControl.showDialog("You Win!");
+		}
+		
+		if (arg0 instanceof GameLostData) {
+			this.gameControl.showDialog("You lose");
+		}
+		
+		if (arg0 instanceof GameTieData) {
+			this.gameControl.showDialog("You tied");
 		}
 	}
 
