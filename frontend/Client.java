@@ -1,9 +1,8 @@
 package frontend;
 
 import ocsf.client.AbstractClient;
-import common.AvailableMoves;
-import common.CommunicationError;
-import common.PositionData;
+import backend.GameInfoData;
+import common.*;
 import common.*;
 
 public class Client extends AbstractClient {
@@ -11,6 +10,7 @@ public class Client extends AbstractClient {
 	private LoginControl loginControl;
 	private CreateAccountControl createAccountControl;
 	private GameControl gameControl;
+	private MenuControl menuControl;
 
 	// Setters for the GUI controllers.
 	public void setLoginControl(LoginControl loginControl) {
@@ -65,6 +65,14 @@ public class Client extends AbstractClient {
 			}
 		}
 		
+		if (arg0 instanceof GameInfoData) {
+			System.out.println("game info data recieved");
+			GameInfoData info = (GameInfoData) arg0;
+			menuControl.enterGame();
+			gameControl.setBlackUsername(info.getWhite());
+			gameControl.setWhiteUsername(info.getBlack());
+		}
+		
 		if (arg0 instanceof AvailableMoves) {
 			AvailableMoves temp = (AvailableMoves) arg0;
 			AvailableMoves moves = new AvailableMoves(temp.x);
@@ -81,6 +89,22 @@ public class Client extends AbstractClient {
 			Board board = (Board) arg0;
 			gameControl.updateBoard(board);
 		}
+		
+		if (arg0 instanceof GameWonData) {
+			this.gameControl.showDialog("You Win!");
+		}
+		
+		if (arg0 instanceof GameLostData) {
+			this.gameControl.showDialog("You lose");
+		}
+		
+		if (arg0 instanceof GameTieData) {
+			this.gameControl.showDialog("You tied");
+		}
+	}
+
+	public void setMenuControl(MenuControl mc) {
+		this.menuControl = mc;
 	}
 
 }

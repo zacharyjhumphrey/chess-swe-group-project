@@ -2,11 +2,15 @@ package common;
 
 import java.io.Serializable;
 
+import ocsf.server.ConnectionToClient;
+
 public class Player implements Serializable {
 	// Private data fields for the username and password.
 	private String username;
 	private String password;
 	private PieceColor color;
+	private int gameNumber;
+	private ConnectionToClient conn;
 
 	// Getters for the username and password.
 	public String getUsername() {
@@ -33,10 +37,19 @@ public class Player implements Serializable {
 	public void setColor(PieceColor color) {
 		this.color = color;
 	}
+	
 
 	// Constructor that initializes the username and password.
 	public Player(String username, String password) {
 		setUsername(username);
 		setPassword(password);
+	}
+
+	public ConnectionToClient getConnectionToClient() {
+		return conn;
+	}
+
+	public void setConnectionToClient(ConnectionToClient conn) {
+		this.conn = conn;
 	}
 }

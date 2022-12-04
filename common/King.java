@@ -26,8 +26,13 @@ public class King extends PieceData {
 		// (-1, 1), (0 , 1), (1 , 1)
 
 		for (PositionData pos : positions) {
-			PieceData otherPiece = board.getPiece(pos);
-			if (pos.inbounds() && this.onSameTeam(otherPiece)) {
+			if (!pos.inbounds()) {
+				continue;
+			}
+
+			PieceData piece = board.getPiece(pos);
+			
+			if (piece == null || !this.onSameTeam(piece)) {
 				toReturn.add(pos);
 			}
 		}

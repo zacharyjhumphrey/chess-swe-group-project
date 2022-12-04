@@ -55,14 +55,6 @@ public class GameControl implements ActionListener {
 			}
 		}
 
-		// Setting game
-		if (status.equals("win")) {
-			gameText = "You Win";
-		} else if (status.equals("tie")) {
-			gameText = "You Tied";
-		} else if (status.equals("loss")) {
-			gameText = "You Loss";
-		}
 		// TEMP button to check game ending popup
 		if (command.equals("Temp")) {
 
@@ -75,19 +67,40 @@ public class GameControl implements ActionListener {
 			}
 		}
 	}
+	
+	public void showDialog(String msg) {
+		int optionType = JOptionPane.DEFAULT_OPTION;
+		CardLayout cardLayout = (CardLayout) container.getLayout();
+
+		// Game end pop up
+		int option = JOptionPane.showConfirmDialog(container, msg, "Game Ended", optionType);
+		// if button pressed return to main menu
+		if (option == 0) {
+			cardLayout.show(container, "4");
+		}
+
+	}
 
 	public void sendCheckerClickedToServer(PositionData p) {
 		try {
 			this.client.sendToServer(p);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public void updateBoard(Board board) {
-		// TODO Auto-generated method stub
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.updateBoard(board);
+	}
+
+	public void setBlackUsername(String white) {
+		GamePanel panel = (GamePanel) container.getComponent(4);
+		panel.setWhiteUsername(white);
+	}
+
+	public void setWhiteUsername(String black) {
+		GamePanel panel = (GamePanel) container.getComponent(4);
+		panel.setBlackUsername(black);
 	}
 }

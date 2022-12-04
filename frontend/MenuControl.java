@@ -2,13 +2,19 @@ package frontend;
 
 import java.awt.*;
 import javax.swing.*;
+
+import common.StartData;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class MenuControl implements ActionListener {
 	private JPanel container;
 	private Client client;
-
+	private JDialog popUp;
+	private CardLayout cardLayout;
+	
 	public MenuControl(JPanel container, Client client) {
 		this.container = container;
 		this.client = client;
@@ -17,12 +23,14 @@ public class MenuControl implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 		// Get the name of the button clicked.
 		String command = ae.getActionCommand();
-		CardLayout cardLayout = (CardLayout) container.getLayout();
+		cardLayout = (CardLayout) container.getLayout();
+		
+		// TODO move this to constructor? 
 		// If join bottom press create popup
 		if (command.equals("Join")) {
 			//creating pop up within pane
 			final JOptionPane optionPane = new JOptionPane("Waiting to join...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
-			final JDialog popUp = new JDialog();
+			popUp = new JDialog();
 			
 			popUp.setTitle("Joining Game");
 			popUp.setLocationRelativeTo(container);
@@ -32,24 +40,22 @@ public class MenuControl implements ActionListener {
 			popUp.setContentPane(optionPane);
 			popUp.pack();
 			
-			
-			//FIXME change to if game found DO THIS
-			//create timer to dispose of dialog after 5 seconds
-			Timer timer = new Timer(3000, new AbstractAction() {
-			    @Override
-			    public void actionPerformed(ActionEvent ae) {
-			    	//DO THIS 
-			    	cardLayout.show(container, "5");
-			    	popUp.dispose();
-			    }
-			});
-			//FIXME remove timer
-			timer.start();
 			popUp.setVisible(true);
+			try {
+				this.client.sendToServer(new StartData());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		// The Logout button sends the user to initial screen
 		if (command.equals("Log Out")) {	
 			cardLayout.show(container, "1");
 		}	
+	}
+	
+	public void enterGame() {
+    	cardLayout.show(container, "5");
+    	popUp.dispose();
 	}
 }
