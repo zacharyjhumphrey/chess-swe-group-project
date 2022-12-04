@@ -1,6 +1,7 @@
 package frontend;
 
 import ocsf.client.AbstractClient;
+import backend.GameInfoData;
 import common.*;
 import common.*;
 
@@ -9,6 +10,7 @@ public class Client extends AbstractClient {
 	private LoginControl loginControl;
 	private CreateAccountControl createAccountControl;
 	private GameControl gameControl;
+	private MenuControl menuControl;
 
 	// Setters for the GUI controllers.
 	public void setLoginControl(LoginControl loginControl) {
@@ -63,6 +65,14 @@ public class Client extends AbstractClient {
 			}
 		}
 		
+		if (arg0 instanceof GameInfoData) {
+			System.out.println("game info data recieved");
+			GameInfoData info = (GameInfoData) arg0;
+			menuControl.enterGame();
+			gameControl.setBlackUsername(info.getWhite());
+			gameControl.setWhiteUsername(info.getBlack());
+		}
+		
 		if (arg0 instanceof AvailableMoves) {
 			AvailableMoves temp = (AvailableMoves) arg0;
 			AvailableMoves moves = new AvailableMoves(temp.x);
@@ -91,6 +101,10 @@ public class Client extends AbstractClient {
 		if (arg0 instanceof GameTieData) {
 			this.gameControl.showDialog("You tied");
 		}
+	}
+
+	public void setMenuControl(MenuControl mc) {
+		this.menuControl = mc;
 	}
 
 }

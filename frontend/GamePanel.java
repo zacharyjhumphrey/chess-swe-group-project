@@ -32,7 +32,9 @@ public class GamePanel extends JPanel {
 	private AvailableMoves currentAvailableMoves;
 	private Color dark = new Color(102, 76, 131);
 	private Color light = new Color(179, 160, 200);
-
+	private JLabel white;
+	private JLabel black;
+	
 	// TODO turn the piece images into static assets
 
 	// Constructor for the game panel.
@@ -46,15 +48,15 @@ public class GamePanel extends JPanel {
 		JPanel logoutPanel = new JPanel(new FlowLayout());
 
 		// Creating Buttons and labels
-		JLabel p1 = new JLabel("Player 1", JLabel.CENTER); // Can get username here
-		JLabel p2 = new JLabel("Player 2", JLabel.CENTER); // Can get username here
+		black = new JLabel("Player 1", JLabel.CENTER); // Can get username here
+		white = new JLabel("Player 2", JLabel.CENTER); // Can get username here
 		JButton logout = new JButton("Log Out");
 		logout.addActionListener(gc);
 
 		// Create the logout button.
-		top.add(p1);
+		top.add(white);
 		drawBoard(new Board());
-		bottom.add(p2);
+		bottom.add(black);
 		logoutPanel.add(logout);
 		bottom.add(logoutPanel);
 		display.add(top, BorderLayout.NORTH);
@@ -65,8 +67,6 @@ public class GamePanel extends JPanel {
 	}
 
 	public void drawBoard(Board board) {
-		//		center.removeAll();
-
 		JPanel boardGrid = new JPanel(new GridLayout(10, 10));
 		boardGrid.setPreferredSize(new Dimension(750, 750));
 
@@ -160,6 +160,14 @@ public class GamePanel extends JPanel {
 				}
 			}
 		}
+	}
+	
+	public void setWhiteUsername(String un) {
+		this.white.setText(un);
+	}
+	
+	public void setBlackUsername(String un) {
+		this.black.setText(un);
 	}
 
 	public void setAvailableMoves(AvailableMoves moves) {

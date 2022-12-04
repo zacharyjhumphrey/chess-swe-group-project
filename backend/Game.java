@@ -24,14 +24,12 @@ public class Game {
 	private Player blackPlayer;
 	private Player currentPlayer;
 	private Player winner;
-	private boolean gameStarted = false;
 	private boolean gameOver = false;
 
 	public Game(Player white, Player black) {
 		this.whitePlayer = white;
 		this.blackPlayer = black;
 		this.currentPlayer = this.whitePlayer;
-		// initializeBoard();
 	}
 
 	public Player getWhitePlayer() {
@@ -146,10 +144,6 @@ public class Game {
 	public GameInfoData sendGameInfo() {
 		GameInfoData info = new GameInfoData(this.whitePlayer.getUsername(), this.blackPlayer.getUsername());
 		return info;
-	}
-
-	public void startGame() {
-		gameStarted = true;
 	}
 
 	// TODO I believe this is printing the board sideways, plz fix

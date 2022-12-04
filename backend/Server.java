@@ -25,7 +25,6 @@ public class Server extends AbstractServer {
 	private Game currentGame;
 	private HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 	private HashMap<Long, Player> players = new HashMap<Long, Player>();
-	private int gameCounter = 0;
 
 	public Server() {
 		super(8300);
@@ -39,8 +38,11 @@ public class Server extends AbstractServer {
 
 	public void createGame(Player p1, Player p2) {
 		currentGame = new Game(p1, p2);
-		games.put(gameCounter, currentGame);
-		gameCounter++;
+		int gameId = (int) (Math.random() * 999999);
+		games.put(gameId, currentGame);
+		
+//		currentGame = new Game();
+//		currentGame.startGame();
 	}
 
 	public static void main(String[] args) {
@@ -96,8 +98,8 @@ public class Server extends AbstractServer {
 			if (database.credentialsValid(loginData)) {
 				try {
 					Player player = new Player(loginData.getUsername(), loginData.getPassword());
-//					player.setConnectionToClient(arg1);
-//					players.put(arg1.getId(), player);
+					player.setConnectionToClient(arg1);
+					players.put(arg1.getId(), player);
 
 					arg1.sendToClient("LoginSuccessful");
 					
@@ -121,18 +123,27 @@ public class Server extends AbstractServer {
 		if (arg0 instanceof StartData) {
 			StartData startData = (StartData) arg0;
 			System.out.println("start data recieved");
-			userswaitingforgame.add(startData.getUser());
+			Player playerRequestingStart = players.get(arg1.getId());
+			
+			userswaitingforgame.add(playerRequestingStart);
 			if (userswaitingforgame.size() >= 2) {
 				// FIXME get player references
-				currentGame = new Game(userswaitingforgame.remove(), userswaitingforgame.remove());
-				int gameId = (int) (Math.random() * 999999);
-				games.put(gameId, currentGame);
-				currentGame.startGame();
+				Player p1 = userswaitingforgame.remove();
+				Player p2 = userswaitingforgame.remove();
+				GameInfoData info = new GameInfoData(p1.getUsername(), p2.getUsername());
+				createGame(p1, p2);
+				try {
+					p2.getConnectionToClient().sendToClient(info);
+					p1.getConnectionToClient().sendToClient(info);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				System.out.println(currentGame.toString());
 				System.out.println("white: " + currentGame.getWhitePlayer().getUsername());
 				System.out.println("black: " + currentGame.getBlackPlayer().getUsername());
 			} else {
-				System.out.println(startData.getUser().getUsername() + " is waiting");
+				System.out.println(playerRequestingStart.getUsername() + " is waiting");
 				try {
 					arg1.sendToClient(currentGame.waitUser());
 				} catch (IOException e) {
@@ -198,10 +209,6 @@ public class Server extends AbstractServer {
 					
 					winnerConnection.sendToClient(new GameWonData());
 					loserConnection.sendToClient(new GameLostData());
-					
-					
-					
-					// TODO update win/loss in db
 				}
 
 			} catch (IOException e) {
@@ -261,13 +268,5 @@ public class Server extends AbstractServer {
 
 	protected void clientConnected(ConnectionToClient clientConn) {
 		System.out.println("Client Connected: " + clientConn.getId());
-		Player p = (players.size() == 1) ? new Player("player1", "pw") : new Player("player2", "pw");
-		p.setConnectionToClient(clientConn);
-		players.put(clientConn.getId(), p);
-
-		if (players.keySet().size() >= 2) {
-			Iterator<Player> playersList = players.values().iterator();
-			createGame(playersList.next(), playersList.next());
-		}
 	}
 }

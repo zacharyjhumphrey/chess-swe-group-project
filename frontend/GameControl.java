@@ -85,14 +85,22 @@ public class GameControl implements ActionListener {
 		try {
 			this.client.sendToServer(p);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public void updateBoard(Board board) {
-		// TODO Auto-generated method stub
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.updateBoard(board);
+	}
+
+	public void setBlackUsername(String white) {
+		GamePanel panel = (GamePanel) container.getComponent(4);
+		panel.setWhiteUsername(white);
+	}
+
+	public void setWhiteUsername(String black) {
+		GamePanel panel = (GamePanel) container.getComponent(4);
+		panel.setBlackUsername(black);
 	}
 }
