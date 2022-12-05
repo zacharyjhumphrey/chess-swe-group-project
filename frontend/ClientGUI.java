@@ -67,6 +67,7 @@ public class ClientGUI extends JFrame {
 		// Show the JFrame.
 		this.setSize(750, 900);
 		this.setVisible(true);
+		this.setResizable(false);
 	}
 	
 	// Main function that creates the client GUI when the program is started.
