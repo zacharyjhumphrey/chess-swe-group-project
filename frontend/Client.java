@@ -1,14 +1,16 @@
 package frontend;
 
 import ocsf.client.AbstractClient;
-import common.AvailableMoves;
-import common.CommunicationError;
+import backend.GameInfoData;
+import common.*;
+import common.*;
 
 public class Client extends AbstractClient {
 	// Private data fields for storing the GUI controllers.
 	private LoginControl loginControl;
 	private CreateAccountControl createAccountControl;
 	private GameControl gameControl;
+	private MenuControl menuControl;
 
 	// Setters for the GUI controllers.
 	public void setLoginControl(LoginControl loginControl) {
@@ -31,7 +33,6 @@ public class Client extends AbstractClient {
 	// Method that handles messages from the server.
 	public void handleMessageFromServer(Object arg0) {
 		System.out.println("recieved msg from server");
-		
 		// If we received a String, figure out what this event is.
 		if (arg0 instanceof String) {
 			// Get the text of the message.
@@ -64,12 +65,46 @@ public class Client extends AbstractClient {
 			}
 		}
 		
+		if (arg0 instanceof GameInfoData) {
+			System.out.println("game info data recieved");
+			GameInfoData info = (GameInfoData) arg0;
+			menuControl.enterGame();
+			gameControl.setBlackUsername(info.getWhite());
+			gameControl.setWhiteUsername(info.getBlack());
+		}
+		
 		if (arg0 instanceof AvailableMoves) {
-			AvailableMoves moves = (AvailableMoves) arg0;
+			AvailableMoves temp = (AvailableMoves) arg0;
+			AvailableMoves moves = new AvailableMoves(temp.x);
+			System.out.println(moves.x);
 			System.out.println("recieved moves from server");
-			System.out.println(moves.getMoves().get(0));
+			for (PositionData pos : moves.getMoves()) {
+				System.out.println(pos);
+			}
 			gameControl.setAvailableMoves(moves);
 		}
+		
+		if (arg0 instanceof Board) {
+			System.out.println("board recieved");
+			Board board = (Board) arg0;
+			gameControl.updateBoard(board);
+		}
+		
+		if (arg0 instanceof GameWonData) {
+			this.gameControl.showDialog("You Win!");
+		}
+		
+		if (arg0 instanceof GameLostData) {
+			this.gameControl.showDialog("You lose");
+		}
+		
+		if (arg0 instanceof GameTieData) {
+			this.gameControl.showDialog("You tied");
+		}
+	}
+
+	public void setMenuControl(MenuControl mc) {
+		this.menuControl = mc;
 	}
 
 }

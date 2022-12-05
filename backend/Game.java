@@ -1,69 +1,111 @@
 package backend;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import common.InitialBoardPosition;
+import common.AvailableMoves;
+import common.Board;
+import common.GameLostData;
+import common.GameTieData;
+import common.GameWonData;
+import common.King;
+import common.PieceColor;
 import common.PieceData;
+import common.Player;
 import common.PositionData;
-import backend.GameWonData;
 
 public class Game {
-	private PieceData[][] board = new PieceData[8][8];
-	private String whiteName;
-	private String blackName;
-	private boolean gameStarted = false;
+	private Board board = new Board();
 	private HashMap<List<Integer>, PieceData> pieces = new HashMap<List<Integer>, PieceData>();
+	private AvailableMoves currentAvailableMoves = null;
+	private PieceData currentPiece = null;
+	private Player whitePlayer;
+	private Player blackPlayer;
+	private Player currentPlayer;
+	private Player winner;
+	private boolean gameOver = false;
 
-	public Game() {
-		initializeBoard();
-	}
-	public String getWhite() {
-		return whiteName;
-	}
-	public String getBlack() {
-		return blackName;
-	}
-	public void initializeBoard() {
-		this.board = InitialBoardPosition.getBoardStartingPosition();
-		for(int x=0;x<board.length;x++) {
-			for(int y=0;y<board[x].length;y++) {
-				if(board[x][y] != null) {
-					pieces.put(Arrays.asList(x+1,y+1), board[x][y]);
-				} 
-			}
-		}
-		
-		
+	public Game(Player white, Player black) {
+		this.whitePlayer = white;
+		this.blackPlayer = black;
+		this.currentPlayer = this.whitePlayer;
 	}
 
-	public void updateBoard() {
-//		board = new PieceData[8][8];
+	public Player getWhitePlayer() {
+		return this.whitePlayer;
+	}
+	
+	public Player getBlackPlayer() {
+		return this.blackPlayer;
+	}
+	
+	public Player getCurrentPlayer() {
+		return this.currentPlayer;
+	}
 
-//		for(PieceData p : pieces.values()) {
-//			board[p.getPosition().y][p.getPosition().x] = p;
+	public Board getBoard() {
+		return board;
+	}
+
+	public AvailableMoves getCurrentAvailableMoves() {
+		return this.currentAvailableMoves;
+	}
+
+	public boolean isWhiteCurrentPlayer() {
+		return this.currentPlayer == this.whitePlayer;
+	}
+
+	public boolean isBlackCurrentPlayer() {
+		return this.currentPlayer == this.blackPlayer;
+	}
+
+	/**
+	 * TODO test move piece, set current piece and moves to null set current player
+	 * to the other player
+	 * 
+	 * @param fromPos
+	 * @param toPos
+	 */
+	public void movePiece(PositionData fromPos, PositionData toPos) {
+		this.currentAvailableMoves = null;
+		this.currentPiece = null;
+		movePiece(fromPos, toPos);
+	}
+
+	public void updateBoard(Board newBoard) {
+		board = newBoard;
+	}
+
+	public AvailableMoves setCurrentPiece(PositionData pos) {
+//		if (this.currentPlayer.getColor() != this.board.getPiece(pos).getColor()) {
+//			return null;
 //		}
-		System.out.println(this.toString());
+		AvailableMoves moves = this.getAvailableMoves(pos);
+		this.currentAvailableMoves = moves;
+		this.currentPiece = this.board.getPiece(pos);
+		return moves;
 	}
 
-	public boolean inbounds(int x, int y) {
-
-		if (x < 1 || x > 8) {
-			return false;
+	public void moveCurrentPieceToPosition(PositionData toPos) {
+		this.board.movePiece(this.currentPiece.getPosition(), toPos);
+		this.currentAvailableMoves = null;
+		this.currentPlayer = (this.isWhiteCurrentPlayer()) ? this.blackPlayer : this.whitePlayer;
+		this.gameOver = (this.board.getBlackKing().isRemoved() || this.board.getWhiteKing().isRemoved());
+		System.out.println("game status is : " + this.isGameOver());
+		if (this.isGameOver()) {
+			this.winner = (this.board.getBlackKing().isRemoved()) ? this.whitePlayer : this.blackPlayer;
 		}
-		if (y < 1 || y > 8) {
-			return false;
-		}
+	}
 
-		return true;
+	public AvailableMoves getAvailableMoves(PositionData pos) {
+		return board.getPiece(pos).getAvailableMoves(board);
 	}
 
 	public boolean checkCollision(PositionData p) {
-		for ( List<Integer> key : pieces.keySet()) {
+		for (List<Integer> key : pieces.keySet()) {
 			if (key.get(0) == p.x) {
-				if(key.get(1) == p.y) {
+				if (key.get(1) == p.y) {
 					return true;
 				}
 			}
@@ -75,11 +117,15 @@ public class Game {
 		return pieces;
 	}
 	
+	public boolean isGameOver() {
+		return this.gameOver;
+	}
+
 	public GameWonData winGame() {
 		GameWonData win = new GameWonData();
 		return win;
 	}
-	
+
 	public GameTieData tieGame() {
 		GameTieData tie = new GameTieData();
 		return tie;
@@ -89,34 +135,25 @@ public class Game {
 		GameLostData lose = new GameLostData();
 		return lose;
 	}
-	
+
 	public WaitForGameData waitUser() {
 		WaitForGameData wait = new WaitForGameData();
 		return wait;
 	}
-	
+
 	public GameInfoData sendGameInfo() {
-		GameInfoData info = new GameInfoData(whiteName,blackName);
+		GameInfoData info = new GameInfoData(this.whitePlayer.getUsername(), this.blackPlayer.getUsername());
 		return info;
 	}
-	
-	public void setWhite(String n) {
-		whiteName = n;
-	}
-	public void setBlack(String n) {
-		blackName = n;
-	}
-	
-	public void startGame() {
-		gameStarted = true;
-	}
 
+	// TODO I believe this is printing the board sideways, plz fix
 	public String toString() {
 		String r = "";
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[i][j] != null) {
-					String t = String.format("%10s", board[i][j].getColor() + "," + board[i][j].getType());
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (board.getPiece(i, j) != null) {
+					String t = String.format("%10s",
+							board.getPiece(i, j).getColorAsString() + "," + board.getPiece(i, j).getClass());
 					r += "|" + t + "|";
 				} else {
 					String t = String.format("%10s", "NULL");
@@ -127,6 +164,22 @@ public class Game {
 		}
 
 		return r;
+	}
+
+	public boolean playerDoesNotOwnPiece(PositionData pos) {
+		PieceData piece = this.board.getPiece(pos);
+		
+		if (piece == null) {
+			return false;
+		}
+		
+		Player playerThatOwnsPiece = (piece.getColor() == PieceColor.w) ? this.whitePlayer : this.blackPlayer; 
+		
+		return this.currentPlayer != playerThatOwnsPiece;
+	}
+
+	public Player getWinner() {
+		return this.winner;
 	}
 
 }

@@ -2,8 +2,12 @@ package frontend;
 
 import javax.swing.*;
 
+import common.AvailableMoves;
+import common.PositionData;
+
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ClientGUI extends JFrame {
 
@@ -35,6 +39,8 @@ public class ClientGUI extends JFrame {
 
 		client.setLoginControl(lc);
 		client.setCreateAccountControl(ca);
+		client.setGameControl(gc);
+		client.setMenuControl(mc);
 		
 		// Create the four views. (need the controller to register with the Panels
 		JPanel view1 = new InitialPanel(ic);
@@ -46,22 +52,23 @@ public class ClientGUI extends JFrame {
 		// Add the views to the card layout container.
 		container.add(view1, "1");
 		container.add(view2, "2");
-		container.add(view4, "4");
-		container.add(view5, "5");
-		container.add(view6, "6");
-
+		container.add(view4, "3");
+		container.add(view5, "4");
+		container.add(view6, "5");
+		
 		// Show the initial view in the card layout.
-//		cardLayout.show(container, "1"); FIXME
-		cardLayout.show(container, "6");
-
+		cardLayout.show(container, "1");
+//		cardLayout.show(container, "5");
+//		gc.updateBoard(null);
+		
 		// Add the card layout container to the JFrame.
 		this.add(container, BorderLayout.CENTER);
-
+		
 		// Show the JFrame.
-		this.setSize(900, 900);
+		this.setSize(750, 900);
 		this.setVisible(true);
 	}
-
+	
 	// Main function that creates the client GUI when the program is started.
 	public static void main(String[] args) {
 		new ClientGUI();

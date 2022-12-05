@@ -9,7 +9,6 @@ public class InitialPanel extends JPanel {
 	public InitialPanel(InitialControl menuControl) {
 		// Create the information label.
 		JLabel label = new JLabel("Account Information", JLabel.CENTER);
-
 		// Create the login button.
 		JButton loginBtn = new JButton("Login");
 		loginBtn.addActionListener(menuControl);

@@ -11,31 +11,45 @@ public class CreateAccountPanel extends JPanel
 	private JPasswordField passwordField;
 	private JPasswordField verifyPasswordField;
 	private JLabel errorLabel;
-	  
+
 	// Getter for the text in the username field.
 	public String getUsername()
 	{
 		return usernameField.getText();
 	}
-	  
+
 	// Getter for the text in the password field.
 	public String getPassword()
 	{
 		return new String(passwordField.getPassword());
 	}
-	
+
 	// Getter for the text in the verify password field.
 	public String getVerifyPassword()
 	{
 		return new String(verifyPasswordField.getPassword());
 	}
-	  
+	//setter for username text field
+	public void setUsername(String username)
+	{
+		usernameField.setText(username);;
+	}
+	//setter for password text field
+	public void setPassword(String password)
+	{
+		passwordField.setText(password);
+	}
+	//setter for password text field
+	public void setVerifyPassword(String verifyPassword)
+	{
+		verifyPasswordField.setText(verifyPassword);
+	}
 	// Setter for the error text.
 	public void setError(String error)
 	{
 		errorLabel.setText(error);
 	}
-	  
+
 	// Constructor for the login panel.
 	public CreateAccountPanel(CreateAccountControl createAccountControl)
 	{	        
@@ -63,7 +77,7 @@ public class CreateAccountPanel extends JPanel
 		loginPanel.add(passwordField);
 		loginPanel.add(verifyPasswordLabel);
 		loginPanel.add(verifyPasswordField);
-	    
+
 		// Create a panel for the buttons.
 		JPanel buttonPanel = new JPanel();
 		JButton submitButton = new JButton("Submit");
@@ -80,5 +94,5 @@ public class CreateAccountPanel extends JPanel
 		grid.add(buttonPanel);
 		this.add(grid);
 	}
-	
+
 }

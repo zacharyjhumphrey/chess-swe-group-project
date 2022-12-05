@@ -10,7 +10,14 @@ public class GameInfoData implements Serializable {
 	public GameInfoData(String w, String b) {
 		white = w;
 		black = b;
-				
+	}
+	
+	public String getWhite() {
+		return this.white;
+	}
+	
+	public String getBlack() {
+		return this.black;
 	}
 }
 
