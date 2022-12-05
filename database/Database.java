@@ -176,7 +176,7 @@ public class Database {
 				Statement statement = conn.createStatement();
 				
 				//gets the current number of wins
-				ResultSet rs = statement.executeQuery("SELECT no_losses FROM player WHERE username = '" + username + "';");
+				ResultSet rs = statement.executeQuery("SELECT no_loses FROM player WHERE username = '" + username + "';");
 				int losses = 0;
 				while (rs.next()) {
 					losses = rs.getInt("no_wins");
