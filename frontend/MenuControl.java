@@ -1,6 +1,15 @@
 package frontend;
 
+
 import java.awt.CardLayout;
+=======
+import java.awt.*;
+import javax.swing.*;
+
+import common.LogoutData;
+import common.StartData;
+
+>>>>>>> Stashed changes
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,6 +35,18 @@ public class MenuControl implements ActionListener {
 			CardLayout cardLayout = (CardLayout) container.getLayout();
 			cardLayout.show(container, "6");
 		}
+
+		// The Logout button sends the user to initial screen
+		if (command.equals("Log Out")) {	
+			try {
+				client.sendToServer(new LogoutData(false));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			cardLayout.show(container, "1");
+		}	
+
 	}
 
 }

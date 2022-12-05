@@ -22,6 +22,31 @@ public class Game {
 	}
 	public String getWhite() {
 		return whiteName;
+
+	
+	public void endGame() {
+		gameOver = true;
+	}
+
+	public Player getWhitePlayer() {
+		return this.whitePlayer;
+	}
+	
+	public Player getBlackPlayer() {
+		return this.blackPlayer;
+	}
+	
+	public Player getCurrentPlayer() {
+		return this.currentPlayer;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public AvailableMoves getCurrentAvailableMoves() {
+		return this.currentAvailableMoves;
+
 	}
 	public String getBlack() {
 		return blackName;
@@ -69,6 +94,10 @@ public class Game {
 			}
 		}
 		return false;
+	}
+	
+	public void setwinner(Player p) {
+		this.winner = p;
 	}
 
 	public HashMap<List<Integer>, PieceData> getPieces() {

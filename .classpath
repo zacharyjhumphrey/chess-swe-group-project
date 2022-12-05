@@ -6,6 +6,10 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< Updated upstream
+=======
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+>>>>>>> Stashed changes
 	<classpathentry kind="lib" path="C:/Users/colem/Documents/GitHub/chess-swe-group-project/mysql-connector-java-5.1.40-bin.jar"/>
 	<classpathentry kind="lib" path="C:/Users/colem/Documents/GitHub/chess-swe-group-project/ocsf.jar"/>
 	<classpathentry kind="output" path=""/>
