@@ -78,7 +78,7 @@ public class MenuPanel extends JPanel
 		//get player username
 		String username = "Username";
 		//get record size here
-		int recordSize = 0;
+		int recordSize = 50;
 		//get player wins
 		int getWins=10;
 		//get player losses
