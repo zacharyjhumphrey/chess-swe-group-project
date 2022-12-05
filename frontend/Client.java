@@ -69,8 +69,8 @@ public class Client extends AbstractClient {
 			System.out.println("game info data recieved");
 			GameInfoData info = (GameInfoData) arg0;
 			menuControl.enterGame();
-			gameControl.setBlackUsername(info.getWhite());
-			gameControl.setWhiteUsername(info.getBlack());
+			gameControl.setBlackUsername(info.getBlack());
+			gameControl.setWhiteUsername(info.getWhite());
 		}
 		
 		if (arg0 instanceof AvailableMoves) {

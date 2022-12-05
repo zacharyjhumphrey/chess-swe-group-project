@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import common.AvailableMoves;
 import common.Board;
+import common.LogoutData;
 import common.PositionData;
 
 import java.awt.*;
@@ -51,6 +52,12 @@ public class GameControl implements ActionListener {
 					optionType);
 			// if button pressed return to main menu
 			if (verify == 0) {
+				try {
+					client.sendToServer(new LogoutData(true));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				cardLayout.show(container, "1");
 			}
 		}

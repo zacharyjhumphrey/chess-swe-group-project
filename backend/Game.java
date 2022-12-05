@@ -35,7 +35,9 @@ public class Game {
 	public Player getWhitePlayer() {
 		return this.whitePlayer;
 	}
-	
+	public void endGame() {
+		this.gameOver = true;
+	}
 	public Player getBlackPlayer() {
 		return this.blackPlayer;
 	}

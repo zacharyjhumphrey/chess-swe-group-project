@@ -3,6 +3,7 @@ package frontend;
 import java.awt.*;
 import javax.swing.*;
 
+import common.LogoutData;
 import common.StartData;
 
 import java.awt.event.ActionEvent;
@@ -50,6 +51,12 @@ public class MenuControl implements ActionListener {
 		}
 		// The Logout button sends the user to initial screen
 		if (command.equals("Log Out")) {	
+			try {
+				client.sendToServer(new LogoutData(false));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			cardLayout.show(container, "1");
 		}	
 	}
