@@ -54,7 +54,12 @@ public class LoginControl implements ActionListener {
 	// Login successful takes UI to Menu panel, invoked in Client class
 	public void loginSuccess() {
 		CardLayout cardLayout = (CardLayout) container.getLayout();
-		cardLayout.show(container, "5");
+		cardLayout.show(container, "4");
+		
+		LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
+		//Clearing fields if valid
+		loginPanel.setUsername("");
+		loginPanel.setPassword("");
 	}
 
 	// Method that displays a message in the error

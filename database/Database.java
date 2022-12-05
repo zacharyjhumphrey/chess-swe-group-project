@@ -89,7 +89,7 @@ public class Database {
 
 	}
 
-	public void CreateAccount(CreateAccountData createAccountData) {
+	public void createAccount(CreateAccountData createAccountData) {
 		String username = createAccountData.getUsername();
 		String password = createAccountData.getPassword();
 
@@ -112,7 +112,7 @@ public class Database {
 		try {
 			Statement statement = conn.createStatement();
 
-			ResultSet rs = statement.executeQuery("SELECT * FROM player WHERE username='" + username
+			ResultSet rs = statement.executeQuery("SELECT * FROM player WHERE username = '" + username
 					+ "' AND password= AES_ENCRYPT('" + password + "', 'key');");
 
 			if (rs.next()) {
@@ -132,7 +132,7 @@ public class Database {
 		try {
 			Statement statement = conn.createStatement();
 
-			ResultSet rs = statement.executeQuery("SELECT * FROM player WHERE username='" + username + "';");
+			ResultSet rs = statement.executeQuery("SELECT * FROM player WHERE username = '" + username + "';");
 
 			if (rs.next()) {
 				return true;
@@ -140,6 +140,78 @@ public class Database {
 				return false;
 		} catch (SQLException e) {
 			return false;
+		}
+	}
+	
+	// FIXME
+	//update player stats such as wins/loses/ties
+	public void updatePlayerStats(String result, String username) {
+		
+		//if player won
+		if (result.equals("win")) {
+			String dml = "";
+			try {
+				Statement statement = conn.createStatement();
+				
+				//gets the current number of wins
+				ResultSet rs = statement.executeQuery("SELECT no_wins FROM player WHERE username = '" + username + "';");
+				int wins = 0;
+				while (rs.next()) {
+					wins = rs.getInt("no_wins");
+				}
+				wins++; //updates the number of wins by 1;
+				
+				//dml query to update database
+				dml = "UPDATE player SET no_wins = "+ wins +" WHERE username = '" + username + "';";
+				executeDML(dml);
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		//if player lost
+		else if(result.equals("loss")) {
+			String dml = "";
+			try {
+				Statement statement = conn.createStatement();
+				
+				//gets the current number of wins
+				ResultSet rs = statement.executeQuery("SELECT no_losses FROM player WHERE username = '" + username + "';");
+				int losses = 0;
+				while (rs.next()) {
+					losses = rs.getInt("no_wins");
+				}
+				losses++; //updates the number of wins by 1;
+				
+				//dml query to update database
+				dml = "UPDATE player SET no_losses = "+ losses +" WHERE username = '" + username + "';";
+				executeDML(dml);
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		//if player tied
+		else if(result.equals("tie")) {
+			String dml = "";
+			try {
+				Statement statement = conn.createStatement();
+				
+				//gets the current number of wins
+				ResultSet rs = statement.executeQuery("SELECT no_ties FROM player WHERE username = '" + username + "';");
+				int ties = 0;
+				while (rs.next()) {
+					ties = rs.getInt("no_wins");
+				}
+				ties++; //updates the number of wins by 1;
+				
+				//dml query to update database
+				dml = "UPDATE player SET no_ties = "+ ties +" WHERE username = '" + username + "';";
+				executeDML(dml);
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

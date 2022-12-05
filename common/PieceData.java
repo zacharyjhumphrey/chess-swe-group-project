@@ -1,25 +1,29 @@
 package common;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import javax.imageio.ImageIO;
 
 public abstract class PieceData implements Serializable {
-	private String color;
+	private PieceColor color;
 	private String type;
-	private PositionData position;
-	private int value;
+	protected PositionData position;
 	public boolean moved = false;
+	private String name;
+	private boolean removed = false;
 
-	// TODO Test color
-	public PieceData(Color color, int x, int y, String type) {
-		this.color = color.name().toLowerCase();
+	// TODO remove name
+	public PieceData(PieceColor color, int x, int y, String name) {
+		this.color = color;
 		this.position = new PositionData(x, y);
-		this.type = type;
+		this.name = name;
 	}
 	
 	public String getFilePath() {
-		return "assets/" + this.color + this.type + ".png";
+		return "assets/" + this.getColorAsString() + this.name + ".png";
 	}
 
 	public void setPosition(int x, int y) {
@@ -35,17 +39,50 @@ public abstract class PieceData implements Serializable {
 		return type;
 	}
 
-	public String getColor() {
+	public String getColorAsString() {
+		return color.name().toLowerCase();
+	}
+	
+	public PieceColor getColor() {
 		return color;
 	}
 
+	public void move(PositionData toPos) {
+		this.moved = true;
+		this.setPosition(toPos.x, toPos.y);
+	}
+	
+	// TODO Change to static
+	public BufferedImage getImage() throws IOException {
+		return ImageIO.read(new File(getFilePath()));
+	}
+
+	@Override
 	public String toString() {
 		return color + "," + type + " | position (" + position.toString() + ")";
 	}
 
-}
+	public AvailableMoves getAvailableMoves(Board b) {
+		return null;
+	}
+	
+	public boolean isRemoved() {
+		return this.removed;
+	}
 
-enum Color {
-	b,
-	w
+	public boolean onSameTeam(PieceData piece) {
+		if (piece == null) {
+			return false;
+		}
+		return piece.color.equals(this.color);
+	}
+
+	public boolean isValidPosition(PositionData pos) {
+		return pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8;
+	}
+
+	public void removeFromBoard() {
+		removed = true;
+		this.position = null;
+	}
 }
