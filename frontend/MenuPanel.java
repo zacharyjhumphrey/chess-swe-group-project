@@ -96,10 +96,10 @@ public class MenuPanel extends JPanel
 			{
 				String username = stats.get(i).toString();
 				String win = stats.get(i+1).toString();
-				String ties = stats.get(i+2).toString();
-				String losses = stats.get(+3).toString();
+				String losses = stats.get(i+2).toString();
+				String ties = stats.get(+3).toString();
 				stats.get(i).toString();
-				textArea.append(username+"	Wins:"+ win +"	Losses:" +ties+"	Ties:"+ losses+ "\n");
+				textArea.append(username+"	Wins:"+ win +"	Losses:" +losses+"	Ties:"+ ties+ "\n");
 				i+=4;
 			}
 		}
