@@ -83,8 +83,6 @@ public class MenuPanel extends JPanel
 		ArrayList<String> stats =database.getPlayerStats();
 		stats.size();
 		this.repaint();
-		//get player username
-		String username = "Username";
 		//get record size here
 		int recordSize = stats.size();
 		//get player wins
@@ -96,8 +94,12 @@ public class MenuPanel extends JPanel
 			
 			for (int i=0; i<recordSize;)
 			{
+				String username = stats.get(i).toString();
+				String win = stats.get(i+1).toString();
+				String ties = stats.get(i+2).toString();
+				String losses = stats.get(+3).toString();
 				stats.get(i).toString();
-				textArea.append(stats.get(i).toString()+"	Wins:"+ stats.get(i+1).toString()+"	Ties:" +stats.get(i+2).toString()+"	Losses:"+ stats.get(i+1).toString()+ "\n");
+				textArea.append(username+"	Wins:"+ win +"	Losses:" +ties+"	Ties:"+ losses+ "\n");
 				i+=4;
 			}
 		}
