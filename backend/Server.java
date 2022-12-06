@@ -9,6 +9,7 @@ import java.util.*;
 import common.AvailableMoves;
 import common.CommunicationError;
 import common.CreateAccountData;
+import common.GameInfoData;
 import common.GameLostData;
 import common.GameWonData;
 import common.LoginData;
