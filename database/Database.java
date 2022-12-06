@@ -70,6 +70,7 @@ public class Database {
 			while (rs.next()) {
 				for (int i = 0; i < no_columns; i++) {
 					row += rs.getString(i + 1);
+					list.add(rs.getString(i+1));
 				}
 			}
 
@@ -144,8 +145,8 @@ public class Database {
 		}
 	}
 	
-	// FIXME
 	//update player stats such as wins/loses/ties
+	//result should either be "win", "loss", or "tie"
 	public void updatePlayerStats(String result, String username) {
 		
 		//if player won
@@ -177,10 +178,10 @@ public class Database {
 				Statement statement = conn.createStatement();
 				
 				//gets the current number of wins
-				ResultSet rs = statement.executeQuery("SELECT no_loses FROM player WHERE username = '" + username + "';");
+				ResultSet rs = statement.executeQuery("SELECT no_losses FROM player WHERE username = '" + username + "';");
 				int losses = 0;
 				while (rs.next()) {
-					losses = rs.getInt("no_wins");
+					losses = rs.getInt("no_losses");
 				}
 				losses++; //updates the number of wins by 1;
 				
@@ -202,7 +203,7 @@ public class Database {
 				ResultSet rs = statement.executeQuery("SELECT no_ties FROM player WHERE username = '" + username + "';");
 				int ties = 0;
 				while (rs.next()) {
-					ties = rs.getInt("no_wins");
+					ties = rs.getInt("no_ties");
 				}
 				ties++; //updates the number of wins by 1;
 				
@@ -215,5 +216,11 @@ public class Database {
 			}
 		}
 	}
-
+	
+	public ArrayList<String> getPlayerStats(String username){
+		String query = "SELECT no_wins, no_losses, no_ties FROM player WHERE username = '"+ username +"';";
+		ArrayList<String> stats = this.query(query);
+		
+		return stats;
+	}
 }
