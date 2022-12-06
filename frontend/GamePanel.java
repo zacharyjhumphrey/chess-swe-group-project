@@ -146,6 +146,7 @@ public class GamePanel extends JPanel {
 				this.squares[y + 1][x + 1].removeAll();
 				this.squares[y + 1][x + 1].repaint();
 				this.squares[y + 1][x + 1].revalidate();
+				this.squares[y + 1][x + 1].repaint();
 
 				if (piece == null) {
 					continue;
