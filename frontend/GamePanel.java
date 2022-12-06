@@ -65,7 +65,7 @@ public class GamePanel extends JPanel {
 
 		this.add(display);
 	}
-
+	//draws the checks for the board using a 2D array of JLabels
 	public void drawBoard(Board board) {
 		JPanel boardGrid = new JPanel(new GridLayout(10, 10));
 		boardGrid.setPreferredSize(new Dimension(750, 750));
@@ -132,7 +132,7 @@ public class GamePanel extends JPanel {
 
 		center.add(boardGrid);
 	}
-
+	//updates board with the current positions of the pieces
 	public void updateBoard(Board board) {
 		System.out.println("updating board");
 		clearAvailableMoves(this.currentAvailableMoves);

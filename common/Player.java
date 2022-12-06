@@ -38,17 +38,24 @@ public class Player implements Serializable {
 		this.color = color;
 	}
 	
+	public void setGameNumber(int n) {
+		this.gameNumber = n;
+	}
+	public int getGameNumber() {
+		return gameNumber;
+	}
+	
 
 	// Constructor that initializes the username and password.
 	public Player(String username, String password) {
 		setUsername(username);
 		setPassword(password);
 	}
-
+	//getting connection
 	public ConnectionToClient getConnectionToClient() {
 		return conn;
 	}
-
+	//setting connection object
 	public void setConnectionToClient(ConnectionToClient conn) {
 		this.conn = conn;
 	}

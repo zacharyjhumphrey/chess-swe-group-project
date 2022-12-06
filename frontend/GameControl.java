@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import common.AvailableMoves;
 import common.Board;
+import common.LogoutData;
 import common.PositionData;
 
 import java.awt.*;
@@ -23,17 +24,17 @@ public class GameControl implements ActionListener {
 		this.container = container;
 		this.client = client;
 	}
-
+	//returns AvailableMoves
 	public AvailableMoves getAvailableMoves() {
 		return this.availableMoves;
 	}
-
+	//sets AvailableMoves
 	public void setAvailableMoves(AvailableMoves availableMoves) {
 		this.availableMoves = availableMoves;
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.setAvailableMoves(availableMoves);
 	}
-
+	//Button action listeners
 	public void actionPerformed(ActionEvent ae) {
 		// Get the name of the button clicked.
 		String command = ae.getActionCommand();
@@ -51,6 +52,12 @@ public class GameControl implements ActionListener {
 					optionType);
 			// if button pressed return to main menu
 			if (verify == 0) {
+				try {
+					client.sendToServer(new LogoutData(true));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				cardLayout.show(container, "1");
 			}
 		}
@@ -67,7 +74,7 @@ public class GameControl implements ActionListener {
 			}
 		}
 	}
-	
+	//Pop up for when game ends
 	public void showDialog(String msg) {
 		int optionType = JOptionPane.DEFAULT_OPTION;
 		CardLayout cardLayout = (CardLayout) container.getLayout();
@@ -80,7 +87,7 @@ public class GameControl implements ActionListener {
 		}
 
 	}
-
+	//sends clicked button to server
 	public void sendCheckerClickedToServer(PositionData p) {
 		try {
 			this.client.sendToServer(p);
@@ -88,17 +95,17 @@ public class GameControl implements ActionListener {
 			e.printStackTrace();
 		}
 	}
-
+	//updates board
 	public void updateBoard(Board board) {
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.updateBoard(board);
 	}
-
+	//sets username for the black player
 	public void setBlackUsername(String white) {
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.setWhiteUsername(white);
 	}
-
+	//sets username for the white player
 	public void setWhiteUsername(String black) {
 		GamePanel panel = (GamePanel) container.getComponent(4);
 		panel.setBlackUsername(black);

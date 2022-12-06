@@ -2,6 +2,7 @@ package common;
 
 import java.util.List;
 
+//setting board initial positions
 // TODO Deprecate
 public class InitialBoardPosition {
 	public static PieceData[][] getBoardStartingPosition() {

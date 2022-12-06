@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Knight extends PieceData {
+	//constructor
 	public Knight(PieceColor color, int x, int y) {
 		super(color, x, y, "Knight");
 	}
