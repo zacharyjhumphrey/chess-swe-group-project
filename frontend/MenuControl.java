@@ -16,6 +16,7 @@ public class MenuControl implements ActionListener {
 	private JDialog popUp;
 	private CardLayout cardLayout;
 	
+	//constructor
 	public MenuControl(JPanel container, Client client) {
 		this.container = container;
 		this.client = client;
@@ -60,7 +61,7 @@ public class MenuControl implements ActionListener {
 			cardLayout.show(container, "1");
 		}	
 	}
-	
+	//enters client into game and clears the pop up
 	public void enterGame() {
     	cardLayout.show(container, "5");
     	popUp.dispose();

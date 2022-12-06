@@ -1,8 +1,8 @@
 package common;
 
 import java.util.ArrayList;
-
 public class Pawn extends PieceData {
+	//constructor
 	public Pawn(PieceColor color, int x, int y) {
 		super(color, x, y, "Pawn");
 	}

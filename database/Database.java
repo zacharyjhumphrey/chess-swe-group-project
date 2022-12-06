@@ -11,6 +11,7 @@ import java.sql.*;
 public class Database {
 	private Connection conn;
 
+	// constructor for database
 	public Database() {
 		// Open database properties using the FileInputStream
 		try {
@@ -88,7 +89,7 @@ public class Database {
 		st.executeUpdate(dml); // Execute query
 
 	}
-
+	//creates accounts in the database
 	public void createAccount(CreateAccountData createAccountData) {
 		String username = createAccountData.getUsername();
 		String password = createAccountData.getPassword();

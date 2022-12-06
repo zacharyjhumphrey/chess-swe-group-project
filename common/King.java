@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class King extends PieceData {
+	//Constructor
 	public King(PieceColor color, int x, int y) {
 		super(color, x, y, "King");
 	}
 
 	// TODO Test
 	@Override
+	//getting available moves for king
 	public AvailableMoves getAvailableMoves(Board board) {
 		ArrayList<PositionData> toReturn = new ArrayList<>();
 		int x = this.position.x;

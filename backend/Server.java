@@ -31,7 +31,6 @@ public class Server extends AbstractServer {
 		super(8300);
 		database = new Database();
 	}
-
 	public Server(int port) {
 		super(port);
 		database = new Database();
@@ -42,10 +41,10 @@ public class Server extends AbstractServer {
 		int gameId = (int) (Math.random() * 999999);
 		games.put(gameId, currentGame);
 		
-//		currentGame = new Game();
-//		currentGame.startGame();
+		//currentGame = new Game();
+		//currentGame.startGame();
 	}
-
+	//create server
 	public static void main(String[] args) {
 		Server s = new Server();
 		try {
@@ -54,15 +53,15 @@ public class Server extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
-
+	//get game
 	public Game getGame() {
 		return currentGame;
 	}
-
+	//getting current piece
 	public PieceData getCurrentPiece() {
 		return currentPiece;
 	}
-
+	//handing messages from client
 	@Override
 	protected void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 
@@ -280,7 +279,7 @@ public class Server extends AbstractServer {
 
 	}
 
-
+	//handling throw expections
 	protected void listeningException(Throwable exception) {
 		System.out.println("Listening Exception:" + exception);
 		exception.printStackTrace();
@@ -291,19 +290,19 @@ public class Server extends AbstractServer {
 		}
 
 	}
-
+	//printing message to console if server started
 	protected void serverStarted() {
 		System.out.println("Server Started");
 	}
-
+	//printing message to console if server Stopped
 	protected void serverStopped() {
 		System.out.println("Server Stopped");
 	}
-
+	//printing message to console if server closed
 	protected void serverClosed() {
 		System.out.println("server closed");
 	}
-
+	//printing message to console if client connected
 	protected void clientConnected(ConnectionToClient clientConn) {
 		System.out.println("Client Connected: " + clientConn.getId());
 	}
