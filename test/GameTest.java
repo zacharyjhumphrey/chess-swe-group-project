@@ -12,7 +12,7 @@ import common.*;
 
 public class GameTest {
 	
-	@Test
+	@Test 
 	public void testAvailableMovesEqual() {
 		AvailableMoves actualMoves = new AvailableMoves(
 				new ArrayList<>(Arrays.asList(new PositionData[] { new PositionData(1, 0), new PositionData(2, 0) })));
