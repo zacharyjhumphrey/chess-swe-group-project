@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-import database.Database;
-
 public class MenuPanel extends JPanel
 {
 	// Constructor for the menu panel.
@@ -78,34 +76,32 @@ public class MenuPanel extends JPanel
 	//Setting text for text area
 	public void setPlayerRecords(JTextArea  textArea)
 	{
-		Database database = new Database();
-		
-		ArrayList<String> stats =database.getPlayerStats();
+//		
 
 		this.repaint();
 		//get record size here
 		int recordSize = 0;
-		if(stats != null) {
-			 recordSize = stats.size();
-		} 
+//		if(stats != null) {
+//			 recordSize = stats.size();
+//		} 
 		//recordSize = stats.size();
 		//get player wins
 		
 		if (recordSize==0)
 			textArea.append("No Records Found");
-		else
-		{
-			
-			for (int i=0; i<recordSize;)
-			{
-				String username = stats.get(i).toString();
-				String win = stats.get(i+1).toString();
-				String losses = stats.get(i+2).toString();
-				String ties = stats.get(+3).toString();
-				stats.get(i).toString();
-				textArea.append(username+"	Wins:"+ win +"	Losses:" +losses+"	Ties:"+ ties+ "\n");
-				i+=4;
-			}
-		}
+//		else
+//		{
+//			
+//			for (int i=0; i<recordSize;)
+//			{
+//				String username = stats.get(i).toString();
+//				String win = stats.get(i+1).toString();
+//				String losses = stats.get(i+2).toString();
+//				String ties = stats.get(+3).toString();
+//				stats.get(i).toString();
+//				textArea.append(username+"	Wins:"+ win +"	Losses:" +losses+"	Ties:"+ ties+ "\n");
+//				i+=4;
+//			}
+//		}
 	}
 }
