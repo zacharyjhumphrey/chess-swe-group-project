@@ -9,7 +9,6 @@ import java.util.*;
 import common.AvailableMoves;
 import common.CommunicationError;
 import common.CreateAccountData;
-import common.GameInfoData;
 import common.GameLostData;
 import common.GameWonData;
 import common.LoginData;
@@ -35,6 +34,10 @@ public class Server extends AbstractServer {
 	public Server(int port) {
 		super(port);
 		database = new Database();
+	}
+	
+	public void addPlayer(Long l, Player p) {
+		players.put(l, p);
 	}
 	
 	

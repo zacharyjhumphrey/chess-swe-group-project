@@ -6,7 +6,6 @@ import java.util.List;
 
 import common.AvailableMoves;
 import common.Board;
-import common.GameInfoData;
 import common.GameLostData;
 import common.GameTieData;
 import common.GameWonData;
