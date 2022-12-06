@@ -12,24 +12,27 @@ public class Client extends AbstractClient {
 	private GameControl gameControl;
 	private MenuControl menuControl;
 
-	// Setters for the GUI controllers.
+	// Setter for the LoginControl.
 	public void setLoginControl(LoginControl loginControl) {
 		this.loginControl = loginControl;
 	}
-
+	// Setter for the CreateAccountControl.
 	public void setCreateAccountControl(CreateAccountControl createAccountControl) {
 		this.createAccountControl = createAccountControl;
 	}
-
+	//Setter for the game control
 	public void setGameControl(GameControl gc) {
 		this.gameControl = gc;
 	}
-	
+	//Setter for the MenuControl control
+	public void setMenuControl(MenuControl mc) {
+		this.menuControl = mc;
+	}
 	// Constructor for initializing the client with default settings.
 	public Client() {
 		super("localhost", 8300);
 	}
-
+	
 	// Method that handles messages from the server.
 	public void handleMessageFromServer(Object arg0) {
 		System.out.println("recieved msg from server");
@@ -69,8 +72,8 @@ public class Client extends AbstractClient {
 			System.out.println("game info data recieved");
 			GameInfoData info = (GameInfoData) arg0;
 			menuControl.enterGame();
-			gameControl.setBlackUsername(info.getWhite());
-			gameControl.setWhiteUsername(info.getBlack());
+			gameControl.setBlackUsername(info.getBlack());
+			gameControl.setWhiteUsername(info.getWhite());
 		}
 		
 		if (arg0 instanceof AvailableMoves) {
@@ -102,9 +105,4 @@ public class Client extends AbstractClient {
 			this.gameControl.showDialog("You tied");
 		}
 	}
-
-	public void setMenuControl(MenuControl mc) {
-		this.menuControl = mc;
-	}
-
 }

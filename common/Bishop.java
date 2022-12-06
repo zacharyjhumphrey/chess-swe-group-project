@@ -3,10 +3,11 @@ package common;
 import java.util.ArrayList;
 
 public class Bishop extends PieceData {
+	//constructor
 	public Bishop(PieceColor color, int x, int y) {
 		super(color, x, y, "Bishop");
 	}
-
+	//Creating the Bishop object
 	// TODO Create test
 	@Override
 	public AvailableMoves getAvailableMoves(Board board) {

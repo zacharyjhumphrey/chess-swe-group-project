@@ -10,7 +10,7 @@ public class PositionData implements Serializable {
 		this.x = x;
 		this.y = y;
 	}
-
+	//creating string
 	@Override
 	public String toString() {
 		return x + ", " + y;
@@ -24,11 +24,11 @@ public class PositionData implements Serializable {
 		PositionData other = (PositionData) otherObj;
 		return other.x == x && other.y == y;
 	}
-
+	//getting relative position
 	public PositionData getRelativePos(int i, int j) {
 		return new PositionData(x + i, y + j);
 	}
-
+	//setting bounds of board
 	public boolean inbounds() {
 		return x >= 0 && x < 8 && y >= 0 && y < 8;
 	}

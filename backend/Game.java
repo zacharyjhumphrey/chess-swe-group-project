@@ -25,37 +25,41 @@ public class Game {
 	private Player currentPlayer;
 	private Player winner;
 	private boolean gameOver = false;
-
+	
 	public Game(Player white, Player black) {
 		this.whitePlayer = white;
 		this.blackPlayer = black;
 		this.currentPlayer = this.whitePlayer;
 	}
-
+	//getting white players
 	public Player getWhitePlayer() {
 		return this.whitePlayer;
 	}
-	
+	//setting game over status
+	public void endGame() {
+		this.gameOver = true;
+	}
+	//getting black players
 	public Player getBlackPlayer() {
 		return this.blackPlayer;
 	}
-	
+	//getting current players
 	public Player getCurrentPlayer() {
 		return this.currentPlayer;
 	}
-
+	//getting board
 	public Board getBoard() {
 		return board;
 	}
-
+	//getting available moves
 	public AvailableMoves getCurrentAvailableMoves() {
 		return this.currentAvailableMoves;
 	}
-
+	//checking color of player
 	public boolean isWhiteCurrentPlayer() {
 		return this.currentPlayer == this.whitePlayer;
 	}
-
+	//checking color of player
 	public boolean isBlackCurrentPlayer() {
 		return this.currentPlayer == this.blackPlayer;
 	}
@@ -67,16 +71,17 @@ public class Game {
 	 * @param fromPos
 	 * @param toPos
 	 */
+	//moving pieces
 	public void movePiece(PositionData fromPos, PositionData toPos) {
 		this.currentAvailableMoves = null;
 		this.currentPiece = null;
 		movePiece(fromPos, toPos);
 	}
-
+	//recreating board
 	public void updateBoard(Board newBoard) {
 		board = newBoard;
 	}
-
+	//setting pieces
 	public AvailableMoves setCurrentPiece(PositionData pos) {
 //		if (this.currentPlayer.getColor() != this.board.getPiece(pos).getColor()) {
 //			return null;
@@ -86,7 +91,7 @@ public class Game {
 		this.currentPiece = this.board.getPiece(pos);
 		return moves;
 	}
-
+	//moving current piece
 	public void moveCurrentPieceToPosition(PositionData toPos) {
 		this.board.movePiece(this.currentPiece.getPosition(), toPos);
 		this.currentAvailableMoves = null;
@@ -97,7 +102,7 @@ public class Game {
 			this.winner = (this.board.getBlackKing().isRemoved()) ? this.whitePlayer : this.blackPlayer;
 		}
 	}
-
+	//getting available moves
 	public AvailableMoves getAvailableMoves(PositionData pos) {
 		return board.getPiece(pos).getAvailableMoves(board);
 	}
@@ -112,35 +117,35 @@ public class Game {
 		}
 		return false;
 	}
-
+	//get piece
 	public HashMap<List<Integer>, PieceData> getPieces() {
 		return pieces;
 	}
-	
+	//setting game over status
 	public boolean isGameOver() {
 		return this.gameOver;
 	}
-
+	//setting game status
 	public GameWonData winGame() {
 		GameWonData win = new GameWonData();
 		return win;
 	}
-
+	//setting game status
 	public GameTieData tieGame() {
 		GameTieData tie = new GameTieData();
 		return tie;
 	}
-
+	//setting game status
 	public GameLostData loseGame() {
 		GameLostData lose = new GameLostData();
 		return lose;
 	}
-
+	//creating the wait object
 	public WaitForGameData waitUser() {
 		WaitForGameData wait = new WaitForGameData();
 		return wait;
 	}
-
+	//sending game players
 	public GameInfoData sendGameInfo() {
 		GameInfoData info = new GameInfoData(this.whitePlayer.getUsername(), this.blackPlayer.getUsername());
 		return info;
@@ -165,7 +170,7 @@ public class Game {
 
 		return r;
 	}
-
+	//verifying pieces
 	public boolean playerDoesNotOwnPiece(PositionData pos) {
 		PieceData piece = this.board.getPiece(pos);
 		
@@ -177,7 +182,7 @@ public class Game {
 		
 		return this.currentPlayer != playerThatOwnsPiece;
 	}
-
+	//getting game winner
 	public Player getWinner() {
 		return this.winner;
 	}

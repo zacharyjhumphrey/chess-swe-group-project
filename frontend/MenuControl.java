@@ -3,6 +3,7 @@ package frontend;
 import java.awt.*;
 import javax.swing.*;
 
+import common.LogoutData;
 import common.StartData;
 
 import java.awt.event.ActionEvent;
@@ -15,6 +16,7 @@ public class MenuControl implements ActionListener {
 	private JDialog popUp;
 	private CardLayout cardLayout;
 	
+	//constructor
 	public MenuControl(JPanel container, Client client) {
 		this.container = container;
 		this.client = client;
@@ -50,12 +52,24 @@ public class MenuControl implements ActionListener {
 		}
 		// The Logout button sends the user to initial screen
 		if (command.equals("Log Out")) {	
+			try {
+				client.sendToServer(new LogoutData(false));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			cardLayout.show(container, "1");
 		}	
 	}
-	
+	//enters client into game and clears the pop up
 	public void enterGame() {
     	cardLayout.show(container, "5");
     	popUp.dispose();
 	}
+	
 }
+
+
+
+
+

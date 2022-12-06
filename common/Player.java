@@ -44,11 +44,11 @@ public class Player implements Serializable {
 		setUsername(username);
 		setPassword(password);
 	}
-
+	//getting connection
 	public ConnectionToClient getConnectionToClient() {
 		return conn;
 	}
-
+	//setting connection object
 	public void setConnectionToClient(ConnectionToClient conn) {
 		this.conn = conn;
 	}

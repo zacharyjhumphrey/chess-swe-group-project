@@ -12,6 +12,7 @@ public class CreateAccountData implements Serializable{
 	  {
 	    return username;
 	  }
+	  //get user password
 	  public String getPassword()
 	  {
 	    return password;
