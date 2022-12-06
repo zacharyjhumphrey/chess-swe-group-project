@@ -81,10 +81,14 @@ public class MenuPanel extends JPanel
 		Database database = new Database();
 		
 		ArrayList<String> stats =database.getPlayerStats();
-		stats.size();
+
 		this.repaint();
 		//get record size here
-		int recordSize = stats.size();
+		int recordSize = 0;
+		if(stats != null) {
+			 recordSize = stats.size();
+		} 
+		//recordSize = stats.size();
 		//get player wins
 		
 		if (recordSize==0)
