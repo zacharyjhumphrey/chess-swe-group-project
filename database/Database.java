@@ -217,8 +217,8 @@ public class Database {
 		}
 	}
 	
-	public ArrayList<String> getPlayerStats(String username){
-		String query = "SELECT no_wins, no_losses, no_ties FROM player WHERE username = '"+ username +"';";
+	public ArrayList<String> getPlayerStats(){
+		String query = "SELECT username, no_wins, no_losses, no_ties FROM player;";
 		ArrayList<String> stats = this.query(query);
 		
 		return stats;

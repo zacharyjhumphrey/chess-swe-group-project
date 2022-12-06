@@ -1,8 +1,6 @@
 package frontend;
 
 import ocsf.client.AbstractClient;
-import backend.GameInfoData;
-import common.*;
 import common.*;
 
 public class Client extends AbstractClient {

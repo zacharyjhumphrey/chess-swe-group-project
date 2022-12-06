@@ -1,0 +1,1 @@
+To run the code, have add the oscf.jar and mysql jar to the build path. Then run server.bat to run the server. Then run client.bat to run the client. 
