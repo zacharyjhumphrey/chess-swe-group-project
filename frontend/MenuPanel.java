@@ -1,7 +1,11 @@
 package frontend;
 
 import java.awt.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
+
+import database.Database;
 
 public class MenuPanel extends JPanel
 {
@@ -74,24 +78,27 @@ public class MenuPanel extends JPanel
 	//Setting text for text area
 	public void setPlayerRecords(JTextArea  textArea)
 	{
+		Database database = new Database();
+		
+		ArrayList<String> stats =database.getPlayerStats();
+		stats.size();
 		this.repaint();
 		//get player username
 		String username = "Username";
 		//get record size here
-		int recordSize = 50;
+		int recordSize = stats.size();
 		//get player wins
-		int getWins=10;
-		//get player losses
-		int getlosses=10;
-		//get player ties
-		int getTies=10;
+		
 		if (recordSize==0)
 			textArea.append("No Records Found");
 		else
 		{
-			for (int i=0; i<recordSize; i++)
+			
+			for (int i=0; i<recordSize;)
 			{
-				textArea.append(username +":	Wins:"+getWins+"	Losses:"+getlosses+"	Ties:"+getTies+"\n");
+				stats.get(i).toString();
+				textArea.append(stats.get(i).toString()+"	Wins:"+ stats.get(i+1).toString()+"	Ties:" +stats.get(i+2).toString()+"	Losses:"+ stats.get(i+1).toString()+ "\n");
+				i+=4;
 			}
 		}
 	}

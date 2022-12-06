@@ -8,7 +8,7 @@ public class Knight extends PieceData {
 	public Knight(PieceColor color, int x, int y) {
 		super(color, x, y, "Knight");
 	}
-
+	//getting available moves
 	@Override
 	public AvailableMoves getAvailableMoves(Board board) {
 		ArrayList<PositionData> toReturn = new ArrayList<>();
