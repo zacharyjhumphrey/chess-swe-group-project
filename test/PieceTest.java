@@ -31,23 +31,10 @@ public class PieceTest {
 				new PositionData(4, 3), new PositionData(4, 2), new PositionData(3, 3), new PositionData(5, 3) })));
 		assertTrue(expectedMoves.equals(actualMoves));
 	}
-
-	// TODO add friendly piece to position where knight would move
+	
 	@Test
-	public void testKnightAvailableMoves() {
-		Game g = new Game(new Player("u", "pw"), new Player("u", "pw"));
-		PieceData[][] board = new PieceData[8][8];
-		PositionData pos = new PositionData(1, 3);
-		board[pos.x][pos.y] = new Knight(PieceColor.w, pos.x, pos.y);
-		board[pos.x + 1][pos.y + 2] = new Pawn(PieceColor.b, pos.x + 1, pos.y - 1);
-		g.updateBoard(new Board(board));
-
-		AvailableMoves actualMoves = g.getAvailableMoves(pos);
-
-		AvailableMoves expectedMoves = new AvailableMoves(new ArrayList<>(Arrays.asList(
-				new PositionData[] { pos.getRelativePos(1, -2), pos.getRelativePos(2, -1), pos.getRelativePos(2, 1),
-						pos.getRelativePos(1, 2), pos.getRelativePos(-1, 2), pos.getRelativePos(-1, -2), })));
-		assertTrue(expectedMoves.equals(actualMoves));
+	public void testPawnGetFilePath() {
+		Pawn pawn = new Pawn(PieceColor.w, 4, 4);
+		assertEquals(pawn.getFilePath(), "wPawn.png");
 	}
-
 }

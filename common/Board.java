@@ -22,8 +22,8 @@ public class Board implements Serializable {
 		this.checkers = checkers;
 		setWhitePieces(Board.getWhitePiecesFrom2DArray(checkers));
 		setBlackPieces(Board.getBlackPiecesFrom2DArray(checkers));
-		setWhiteKing(Board.getWhiteKingFrom2DArray(checkers));
-		setBlackKing(Board.getBlackKingFrom2DArray(checkers));
+//		setWhiteKing(Board.getWhiteKingFrom2DArray(checkers));
+//		setBlackKing(Board.getBlackKingFrom2DArray(checkers));
 	}
 	//getting piece position
 	public PieceData getPiece(PositionData pos) {
@@ -84,22 +84,22 @@ public class Board implements Serializable {
 	//getting all white pieces
 	private static ArrayList<PieceData> getWhitePiecesFrom2DArray(PieceData[][] checkers) {
 		return (ArrayList<PieceData>) Arrays.stream(checkers).flatMap(Arrays::stream)
-				.filter(p -> p.getColor() == PieceColor.w).collect(Collectors.toList());
+				.filter(p -> p != null && p.getColor() == PieceColor.w).collect(Collectors.toList());
 	}
 	//getting all black pieces
 	private static ArrayList<PieceData> getBlackPiecesFrom2DArray(PieceData[][] checkers) {
 		return (ArrayList<PieceData>) Arrays.stream(checkers).flatMap(Arrays::stream)
-				.filter(p -> p.getColor() == PieceColor.b).collect(Collectors.toList());
+				.filter(p -> p != null && p.getColor() == PieceColor.b).collect(Collectors.toList());
 	}
 	//getting white king
 	private static King getWhiteKingFrom2DArray(PieceData[][] checkers) {
 		return (King) Arrays.stream(checkers).flatMap(Arrays::stream)
-				.filter(p -> p.getColor() == PieceColor.w && p.getClass() == King.class).collect(Collectors.toList()).get(0);
+				.filter(p -> p != null && p.getColor() == PieceColor.w && p.getClass() == King.class).collect(Collectors.toList()).get(0);
 	}
 	//getting black king
 	private static King getBlackKingFrom2DArray(PieceData[][] checkers) {
 		return (King) Arrays.stream(checkers).flatMap(Arrays::stream)
-				.filter(p -> p.getColor() == PieceColor.b && p.getClass() == King.class).collect(Collectors.toList()).get(0);
+				.filter(p -> p != null && p.getColor() == PieceColor.b && p.getClass() == King.class).collect(Collectors.toList()).get(0);
 	}
 	//creating board
 	public PieceData[][] initializeBoard() {
