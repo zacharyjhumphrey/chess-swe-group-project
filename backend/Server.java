@@ -18,7 +18,6 @@ import common.Player;
 import common.PositionData;
 import common.StartData;
 
-// TODO we need to actually get two players connected to the same game
 public class Server extends AbstractServer {
 	private Database database;
 	private Queue<Player> userswaitingforgame = new LinkedList<>();
@@ -27,6 +26,7 @@ public class Server extends AbstractServer {
 	private HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 	private HashMap<Long, Player> players = new HashMap<Long, Player>();
 
+	//constructors
 	public Server() {
 		super(8300);
 		database = new Database();
@@ -35,47 +35,44 @@ public class Server extends AbstractServer {
 		super(port);
 		database = new Database();
 	}
-
+	
+	
+	//create a new game and assign it an id
+	//assign the id to the players in the game 
+	//put the game id and game into hashmap of games
 	public void createGame(Player p1, Player p2) {
 		currentGame = new Game(p1, p2);
 		int gameId = (int) (Math.random() * 999999);
+		p1.setGameNumber(gameId);
+		p2.setGameNumber(gameId);
 		games.put(gameId, currentGame);
-		
-		//currentGame = new Game();
-		//currentGame.startGame();
 	}
-	//create server
-	public static void main(String[] args) {
-		Server s = new Server();
-		try {
-			s.listen();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	//get game
+	
+	
+	//return the current game
 	public Game getGame() {
 		return currentGame;
 	}
-	//getting current piece
+	//return the currentPiece
 	public PieceData getCurrentPiece() {
 		return currentPiece;
 	}
-	//handing messages from client
+	//handling messages from client
 	@Override
 	protected void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 
+		//if create account data is received
+		//check that username is not in database
+		//then add user if not
 		if (arg0 instanceof CreateAccountData) {
 			CreateAccountData createAccountData = (CreateAccountData) arg0;
 
-			// checks if username dose not exist
 			if (!database.usernameExists(createAccountData)) {
 				try {
 					database.createAccount(createAccountData);
 					Player newUser = new Player(createAccountData.getUsername(), createAccountData.getPassword());
 					arg1.sendToClient("CreateAccountSuccessful");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {
@@ -84,17 +81,18 @@ public class Server extends AbstractServer {
 							"CreateAccount");
 					arg1.sendToClient(usernameAlreadyExistsError);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 
 		}
 
+		//if login data received
+		//check against data base 
+		//allow user to login
+		//or block user if error in credentials
 		if (arg0 instanceof LoginData) {
 			LoginData loginData = (LoginData) arg0;
-
-			// Checks if username and password exist in database;
 			if (database.credentialsValid(loginData)) {
 				try {
 					Player player = new Player(loginData.getUsername(), loginData.getPassword());
@@ -105,7 +103,6 @@ public class Server extends AbstractServer {
 					
 					System.out.println("Client Logged In : " + player.getUsername() + ", " + arg1.getId());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {
@@ -113,15 +110,21 @@ public class Server extends AbstractServer {
 					CommunicationError invalidCredentialsError = new CommunicationError("Invalid credentials", "Login");
 					arg1.sendToClient(invalidCredentialsError);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-
 		}
+		
+		//if logout data is received
+		//check if player is in a game
+		//if so make that person the loser and the other the winner
+		//if person is in waiting queue
+		//remove the person from queue
 		if (arg0 instanceof LogoutData) {
 			LogoutData logout = (LogoutData)arg0;
 			if(logout.inplay()) {
+				Player p = players.get(arg1.getId());
+				currentGame = games.get(p.getGameNumber());
 				currentGame.endGame();
 				if (this.currentGame.isGameOver()) {
 					System.out.println("game over");
@@ -132,14 +135,19 @@ public class Server extends AbstractServer {
 					
 					if (whitePlayer.getConnectionToClient().equals(arg1)) {
 						winnerConnection = blackPlayer.getConnectionToClient();
+						loserConnection = whitePlayer.getConnectionToClient();
 						database.updatePlayerStats("win", blackPlayer.getUsername());
+						database.updatePlayerStats("loss", whitePlayer.getUsername());
 					} else {
 						winnerConnection = whitePlayer.getConnectionToClient();
+						loserConnection = blackPlayer.getConnectionToClient();
+						database.updatePlayerStats("loss", blackPlayer.getUsername());
 						database.updatePlayerStats("win", whitePlayer.getUsername());
 					}
 					
 					try {
 						winnerConnection.sendToClient(new GameWonData());
+						loserConnection.sendToClient(new GameLostData());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -151,7 +159,11 @@ public class Server extends AbstractServer {
 				}
 			}
 		}
-
+		
+		//if start data is received
+		//add the player into the queue if it is empty
+		//if not empty pair players from queue and create a new game
+		//also checks if same player is trying to enter queue and prevents it
 		if (arg0 instanceof StartData) {
 			StartData startData = (StartData) arg0;
 			System.out.println("start data recieved");
@@ -164,7 +176,6 @@ public class Server extends AbstractServer {
 				try {
 					arg1.sendToClient(null);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -191,11 +202,16 @@ public class Server extends AbstractServer {
 			}
 		}
 
-		// user clicks on a checker on the board
+		//if position data is recieved
+		//checks if position contains piece 
+		//also checks if position is an available move
+		//moves pieces and sends end of game data (win,tie,lose)
 		if (arg0 instanceof PositionData) {
 			PositionData position = (PositionData)arg0;
 			System.out.println("position data has been recieved: " + position.x + ", " + position.y);
-
+			Player p = players.get(arg1.getId());
+			currentGame = games.get(p.getGameNumber());
+			//set currentgame to the players game
 			AvailableMoves moves = this.currentGame.getCurrentAvailableMoves();
 			Player clientPlayer = players.get(arg1.getId());
 
@@ -204,7 +220,6 @@ public class Server extends AbstractServer {
 				try {
 					arg1.sendToClient(null);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				return;
@@ -221,7 +236,6 @@ public class Server extends AbstractServer {
 					blackConnection.sendToClient(this.currentGame.getBoard());
 					whiteConnection.sendToClient(this.currentGame.getBoard());
 
-					// TODO if win, send win/loss to both clients
 					if (this.currentGame.isGameOver()) {
 						System.out.println("game over");
 						Player whitePlayer = this.currentGame.getWhitePlayer();
@@ -246,7 +260,6 @@ public class Server extends AbstractServer {
 					}
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -279,7 +292,7 @@ public class Server extends AbstractServer {
 
 	}
 
-	//handling throw expections
+	//handling thrown exceptions
 	protected void listeningException(Throwable exception) {
 		System.out.println("Listening Exception:" + exception);
 		exception.printStackTrace();
@@ -306,4 +319,14 @@ public class Server extends AbstractServer {
 	protected void clientConnected(ConnectionToClient clientConn) {
 		System.out.println("Client Connected: " + clientConn.getId());
 	}
+	
+	//create server
+		public static void main(String[] args) {
+			Server s = new Server();
+			try {
+				s.listen();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 }
